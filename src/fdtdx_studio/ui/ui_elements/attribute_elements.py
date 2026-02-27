@@ -58,6 +58,10 @@ class SelectElement(AttributeElement):
     """UI element for selecting from a list of options."""
     options: List[Any] = field(default_factory=list)
 
+    def __init__(self, label: str, value: Any, on_change: Callable[[Any], None], options: List[Any], tooltip: Optional[str] = None):
+        super().__init__(label, value, on_change, tooltip)
+        self.options = options
+
     def render(self):
         self.element = ui.select(self.options, label=self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
         self.element.classes('w-full')
@@ -69,6 +73,11 @@ class SelectElement(AttributeElement):
 class MultiSelectElement(AttributeElement):
     """UI element for selecting multiple items from a list."""
     options: List[Any] = field(default_factory=list)
+
+    def __init__(self, label: str, value: Any, on_change: Callable[[Any], None], options: List[Any], tooltip: Optional[str] = None):
+        super().__init__(label, value, on_change, tooltip)
+        self.options = options
+        self.__post_init__()
 
     def __post_init__(self):
         if self.value is None:

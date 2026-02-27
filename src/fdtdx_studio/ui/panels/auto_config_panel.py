@@ -102,19 +102,19 @@ class AutoConfigPanel(ObjectConfigPanel):
                 self.validate_name(val) # Uses logic from base
         
         if definition.ui_type == 'number':
-            element = NumberElement(definition.label, current_val, on_change_cb, definition.tooltip)
+            element = NumberElement(definition.label, current_val, on_change_cb, tooltip=definition.tooltip)
         elif definition.ui_type == 'string':
-            element = StringElement(definition.label, current_val, on_change_cb, definition.tooltip)
+            element = StringElement(definition.label, current_val, on_change_cb, tooltip=definition.tooltip)
         elif definition.ui_type == 'boolean':
-            element = BooleanElement(definition.label, current_val, on_change_cb, definition.tooltip)
+            element = BooleanElement(definition.label, current_val, on_change_cb, tooltip=definition.tooltip)
         elif definition.ui_type == 'select':
-            element = SelectElement(definition.label, current_val, on_change_cb, definition.options or [], definition.tooltip)
+            element = SelectElement(definition.label, current_val, on_change_cb, options=definition.options or [], tooltip=definition.tooltip)
         elif definition.ui_type == 'multi_select':
-            element = MultiSelectElement(definition.label, current_val, on_change_cb, definition.options or [], definition.tooltip)
+            element = MultiSelectElement(definition.label, current_val, on_change_cb, options=definition.options or [], tooltip=definition.tooltip)
         elif definition.ui_type == 'color':
-             element = ColorElement(definition.label, current_val, on_change_cb, definition.tooltip)
+             element = ColorElement(definition.label, current_val, on_change_cb, tooltip=definition.tooltip)
         elif definition.ui_type == 'vector3':
-             element = Vector3Element(definition.label, current_val, on_change_cb, definition.tooltip)
+             element = Vector3Element(definition.label, current_val, on_change_cb, tooltip=definition.tooltip)
         elif definition.ui_type == 'material_select':
              # Custom logic for material selection using controller
              mat_list = self.controller.model.material.material_list
@@ -133,9 +133,9 @@ class AutoConfigPanel(ObjectConfigPanel):
                  # Update param with the OBJECT, not the name
                  self._update_param(key, obj)
                  
-             element = SelectElement(definition.label, current_name, on_mat_change, options, definition.tooltip)
+             element = SelectElement(definition.label, current_name, on_mat_change, options=options, tooltip=definition.tooltip)
         elif definition.ui_type == 'nested':
-             element = NestedObjectElement(definition.label, current_val, on_change_cb, lambda: self._navigate_to(key, definition.target_cls), definition.tooltip)
+             element = NestedObjectElement(definition.label, current_val, on_change_cb, on_navigate=lambda: self._navigate_to(key, definition.target_cls), tooltip=definition.tooltip)
         
         if element:
             # We keep track of elements to update them if needed (e.g. external update)

@@ -7,6 +7,7 @@ from fdtdx_studio.ui.ui_elements.attribute_elements import (
 from fdtdx_studio.ui.attribute_definitions import OBJECT_DEFINITIONS, AttributeDef
 from typing import Dict, Any, List, Optional
 import inspect
+import copy
 
 class AutoConfigPanel(ObjectConfigPanel):
     """
@@ -188,10 +189,9 @@ class AutoConfigPanel(ObjectConfigPanel):
             self.current_nested_path.pop()
             self.nav_stack.pop()
             self._render_current_level()
-
     def update_values(self, parameters: Dict[str, Any]):
         """Updates the panel with new parameters from the controller/model."""
-        self.local_data = parameters.copy() # Deep copy might be safer but shallow for now
+        self.local_data = copy.deepcopy(parameters)
         self.nav_stack = [] 
         self.current_nested_path = []
         self._render_current_level()
@@ -231,6 +231,7 @@ class AutoConfigPanel(ObjectConfigPanel):
             saver(params)
         else:
             ui.notify(f"No save method for {self.object_type_name}", type='negative')
+            return
             
         super().on_save_clicked() # Calls ui_update
 

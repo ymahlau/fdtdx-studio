@@ -121,7 +121,7 @@ def resolve_favicon(opts: ServerOptions) -> str | None:
     """
     if opts.favicon is None:
         return None
-    if opts.favicon.startswith(("http://", "https://")):
+    if opts.favicon.lower().startswith(("http://", "https://")):
         return opts.favicon
     favicon_path = pathlib.Path(opts.favicon)
     if not favicon_path.is_file():

@@ -110,12 +110,12 @@ export default {
             let isDragging = false;
             let lastMousePos = { x: 0, y: 0 };
 
-            const onMouseDown = (e) => {
+            this._onMouseDown = (e) => {
                 isDragging = true;
                 lastMousePos = { x: e.clientX, y: e.clientY };
             };
 
-            const onMouseMove = (e) => {
+            this._onMouseMove = (e) => {
                 if (!isDragging || !currentSourceVue || !currentSourceVue.camera || !currentSourceVue.controls) return;
 
                 const deltaX = e.clientX - lastMousePos.x;
@@ -128,7 +128,6 @@ export default {
 
                 // Emulate OrbitControls rotation (adjust position in spherical coords)
                 const offset = new THREE.Vector3().copy(mainCamera.position).sub(target);
-                const spherical = new THREE.Spherical().setFromVector3(offset);
 
                 // Typical OrbitControls sensitivity
                 const rotateSpeed = 0.01;
@@ -154,16 +153,16 @@ export default {
                 controls.update();
             };
 
-            const onMouseUp = () => { isDragging = false; };
+            this._onMouseUp = () => { isDragging = false; };
+            this._onContextMenu = (e) => e.preventDefault();
 
-            this.$refs.canvas.addEventListener('mousedown', onMouseDown);
-            window.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('mouseup', onMouseUp);
-            // Optionally disable context menu
-            this.$refs.canvas.addEventListener('contextmenu', e => e.preventDefault());
+            canvas.addEventListener('mousedown', this._onMouseDown);
+            window.addEventListener('mousemove', this._onMouseMove);
+            window.addEventListener('mouseup', this._onMouseUp);
+            canvas.addEventListener('contextmenu', this._onContextMenu);
 
             const animate = () => {
-                requestAnimationFrame(animate);
+                this.animationFrameId = requestAnimationFrame(animate);
 
                 // Fetch the source scene Vue component natively using Vue 3 $refs
                 const sourceVue = this.$root.$refs['r' + sourceSceneId];
@@ -183,6 +182,43 @@ export default {
 
             animate();
         });
+    },
+    beforeUnmount() {
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+
+        if (this._onMouseMove) {
+            window.removeEventListener('mousemove', this._onMouseMove);
+        }
+        if (this._onMouseUp) {
+            window.removeEventListener('mouseup', this._onMouseUp);
+        }
+
+        if (this.$refs.canvas) {
+            const canvas = this.$refs.canvas;
+            if (this._onMouseDown) canvas.removeEventListener('mousedown', this._onMouseDown);
+            if (this._onContextMenu) canvas.removeEventListener('contextmenu', this._onContextMenu);
+        }
+
+        if (this.renderer) {
+            this.renderer.dispose();
+            this.renderer.forceContextLoss();
+        }
+
+        // Traverse and dispose materials/geometries to prevent memory leaks in Three.js
+        if (this.scene) {
+            this.scene.traverse((object) => {
+                if (object.isMesh) {
+                    object.geometry.dispose();
+                    if (object.material.isMaterial) {
+                        object.material.dispose();
+                    } else if (Array.isArray(object.material)) {
+                        object.material.forEach(mat => mat.dispose());
+                    }
+                }
+            });
+        }
     },
     props: {
         sourceSceneId: Number

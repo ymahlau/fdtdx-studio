@@ -1,13 +1,28 @@
 import sys
 import time
+import socket
 from playwright.sync_api import sync_playwright
 import subprocess
+
+def wait_for_server(port=8080, timeout=15.0):
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            with socket.create_connection(("localhost", port), timeout=1.0):
+                return True
+        except OSError:
+            time.sleep(0.1)
+    return False
 
 def test_logs():
     # Start the application as a background process
     print("Starting server...")
-    proc = subprocess.Popen(["uv", "run", "python", "test_view_helper.py"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    time.sleep(3) # wait for server to boot
+    proc = subprocess.Popen(["uv", "run", "python", "test_view_helper.py"], stdout=None, stderr=None)
+    
+    if not wait_for_server():
+        print("Server did not start in time. Exiting.")
+        proc.terminate()
+        return
 
     try:
         with sync_playwright() as p:
@@ -29,7 +44,7 @@ def test_logs():
             page.goto("http://localhost:8080")
             
             # Wait for any potential scripts to run
-            time.sleep(2)
+            page.wait_for_selector('[id^="c"]', timeout=10000)
             
             # Retrieve available global variables
             eval_result = page.evaluate("() => Object.keys(window).filter(k => k.includes('getElement') || k.includes('vue') || k.includes('gui'))")

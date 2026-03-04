@@ -1,5 +1,6 @@
 from nicegui import ui, events
 from fdtdx_studio.ui.scene_3d.koor import CoordinateSystem
+from fdtdx_studio.ui.ui_elements.view_helper import ViewHelper
 
 def scale_number(float_rgb):
     int_rgb = []
@@ -27,6 +28,8 @@ class MainSection:
         'z-index: 1;'
       ) as self.scene:
         pass
+
+      ViewHelper(self.scene)
 
       ui.button(icon='center_focus_strong', on_click=self.center_view).props('flat').style(
         'position: absolute; bottom: 1%; right: 1%; width: 5%; height: 5%;'

@@ -1,7 +1,7 @@
 # config.toml FDTDX server options
 [ui]
 title = "FDTDX Builder"
-favicon = "src/config/fdtdx.svg"    # Page Icon
+favicon = "src/fdtdx_studio/config/fdtdx.svg"    # Page Icon
 port = 8080
 host = "0.0.0.0"               # optional – bind address
 dark = false                    # `null` → let NiceGUI decide (or true/false)

@@ -9,6 +9,23 @@ from typing import Dict, Any, List, Optional
 import inspect
 import copy
 
+def safe_deepcopy(obj):
+    """
+    Safely deepcopy a dictionary or object. 
+    If copy.deepcopy fails (e.g., on frozen pytreeclass instances), 
+    fallback to a shallow copy or recursively copy dicts.
+    """
+    try:
+        return copy.deepcopy(obj)
+    except Exception:
+        if isinstance(obj, dict):
+            return {k: safe_deepcopy(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [safe_deepcopy(v) for v in obj]
+        elif isinstance(obj, tuple):
+            return tuple(safe_deepcopy(v) for v in obj)
+        return obj  # Return reference if it cannot be strictly copied
+
 class AutoConfigPanel(ObjectConfigPanel):
     """
     Panel that automatically constructs UI input elements based on 
@@ -191,7 +208,7 @@ class AutoConfigPanel(ObjectConfigPanel):
             self._render_current_level()
     def update_values(self, parameters: Dict[str, Any]):
         """Updates the panel with new parameters from the controller/model."""
-        self.local_data = copy.deepcopy(parameters)
+        self.local_data = safe_deepcopy(parameters)
         self.nav_stack = [] 
         self.current_nested_path = []
         self._render_current_level()

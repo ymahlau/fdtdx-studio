@@ -4,7 +4,7 @@ from fdtdx_studio.parameter.datatypes.model import Model
 import fdtdx
 from nicegui import ui, events
 from fdtdx_studio.project.project import Project
-from fdtdx_studio.ui.panels import *
+from fdtdx_studio.ui.panels import ObjectConfigPanel, GaussianSourcePanel, ModeSourcePanel, MaterialObjectConfigPanel, FieldDetectorPanel, PoyntingFluxDetectorPanel, EnergyDetectorPanel, ModeOverlapDetectorPanel, Material_panel
 import json
 import inspect
 

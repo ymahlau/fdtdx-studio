@@ -17,14 +17,18 @@ def safe_deepcopy(obj):
     """
     try:
         return copy.deepcopy(obj)
-    except Exception:
+    except (TypeError, AttributeError):
         if isinstance(obj, dict):
             return {k: safe_deepcopy(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [safe_deepcopy(v) for v in obj]
         elif isinstance(obj, tuple):
             return tuple(safe_deepcopy(v) for v in obj)
-        return obj  # Return reference if it cannot be strictly copied
+        
+        try:
+            return copy.copy(obj)  # Fallback to shallow copy if possible
+        except (TypeError, AttributeError):
+            return obj  # Return reference only as a last resort
 
 class AutoConfigPanel(ObjectConfigPanel):
     """
@@ -66,13 +70,10 @@ class AutoConfigPanel(ObjectConfigPanel):
                     ui.button(icon='arrow_back', on_click=self._navigate_back).props('flat round dense')
                     ui.label(" / ".join(self.current_nested_path)).style('font-weight: bold')
             else:
-                 # Top level header? Maybe name?
                  pass
 
             definitions = OBJECT_DEFINITIONS.get(current_type, [])
             if not definitions:
-                # If no definitions found, maybe generic fallback or warning?
-                # For now, just continue (might be empty)
                 pass
 
             # Sort by importance
@@ -89,14 +90,9 @@ class AutoConfigPanel(ObjectConfigPanel):
                              for definition in less_important_defs:
                                  self._create_element(definition)
             
-            # Apply Button (only at top level?)
-            # Usually we save the whole object.
-            # If we are nested, do we save? 
-            # Usually "Apply" saves the whole thing.
             if not self.current_nested_path:
                 ui.separator().classes('my-2')
                 self.save_button = ui.button('Apply', on_click=self.on_save_clicked)
-                # Re-enable logic if needed (validation)
 
     def _create_element(self, definition: AttributeDef):
         """Creates and registers a UI element."""
@@ -106,8 +102,6 @@ class AutoConfigPanel(ObjectConfigPanel):
         # Specific validation or callback
         validation_cb = None
         if key == 'name' and not self.current_nested_path: # Top level name
-             # Validation logic from ObjectConfigPanel
-             # We need to adapt it because ObjectConfigPanel uses self.name.value
              pass 
 
         element = None
@@ -155,10 +149,6 @@ class AutoConfigPanel(ObjectConfigPanel):
              element = NestedObjectElement(definition.label, current_val, on_change_cb, on_navigate=lambda: self._navigate_to(key, definition.target_cls), tooltip=definition.tooltip)
         
         if element:
-            # We keep track of elements to update them if needed (e.g. external update)
-            # But currently `elements` dict keys are simple strings.
-            # If nested, we might overwrite.
-            # Ideally we store by path or just current view elements.
             self.elements[key] = element
             rendered = element.render()
             
@@ -223,8 +213,6 @@ class AutoConfigPanel(ObjectConfigPanel):
     def on_save_clicked(self):
         """Dispatch save to controller."""
         # Using dispatch table or match
-        # We need to map object_type_name to controller methods.
-        # This is a bit fragile if controller methods change, but standard pattern here.
         
         params = self.get_parameters().copy()
         # Remove metadata keys that shouldn't be passed to save methods
@@ -234,8 +222,7 @@ class AutoConfigPanel(ObjectConfigPanel):
         method_map = {
             'GaussianPlaneSource': self.controller.saveGaussianPlaneSourceParams,
             'ModePlaneSource': self.controller.saveModePlaneSourceParams,
-            'UniformMaterialObject': self.controller.saveParams, # Generic? or saveMaterialObjectParams?
-            # Detectors
+            'UniformMaterialObject': self.controller.saveParams, 
             'EnergyDetector': self.controller.saveEnergyDetectorParams,
             'FieldDetector': self.controller.saveFieldDetectorParams,
             'PoyntingFluxDetector': self.controller.savePoyntingFluxDetectorParams,

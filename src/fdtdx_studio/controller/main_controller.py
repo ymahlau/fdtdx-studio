@@ -35,10 +35,12 @@ class Controller:
       print(f"Adding object to model: name={name}, partial_real_shape={partial_real_shape}, partial_real_position={partial_real_position}, color={color}\n")
     name = self.model.namecheck(name) #checks if the name is unique and changes it if not
     self.model.create_material_obj(name=name, partial_real_shape=partial_real_shape, partial_real_position=partial_real_position, color=color, material= material)
-    self.view.left_drawer.scrollarea_add_Object((name,typ))
+    if self.view.left_drawer is not None:
+      self.view.left_drawer.scrollarea_add_Object((name,typ))
     self.view.main_section.add_object((name, typ, partial_real_shape, partial_real_position, color))
     #close popup after reset of inputs
-    popup.close_self()
+    if popup is not None:
+      popup.close_self()
 
   def set_pml_thickness(self, thickness):
     '''sets PML thickness to the given value'''
@@ -98,7 +100,8 @@ class Controller:
       project.model.create_gaussian_plane_source_obj(**kwargs)
     else:
       self.model.create_gaussian_plane_source_obj(**kwargs)
-      self.view.left_drawer.scrollarea_add_Object((kwargs['name'],typ))
+      if self.view.left_drawer is not None:
+        self.view.left_drawer.scrollarea_add_Object((kwargs['name'],typ))
     #TODO they are just boxes for now
       self.view.main_section.add_object((name, typ, partial_real_shape, (0,0,0), color))     
 
@@ -124,7 +127,8 @@ class Controller:
       project.model.create_mode_plane_source_obj(**kwargs)
     else:
       self.model.create_mode_plane_source_obj(**kwargs)
-      self.view.left_drawer.scrollarea_add_Object((kwargs['name'],typ))
+      if self.view.left_drawer is not None:
+        self.view.left_drawer.scrollarea_add_Object((kwargs['name'],typ))
     #TODO they are just boxes for now
       self.view.main_section.add_object((name, typ, partial_real_shape, (0,0,0), color))     
 
@@ -244,14 +248,17 @@ class Controller:
     '''adds custom material to current scene'''
     name = self.namecheck_material(self.model.material.get_material_list(), name)
     self.model.material.create_new_material(permittivity=Permittivity, permability=Permeability, e_conductivity=Electrical_conductivity, m_conductivity=Magnetic_conductivity, name=name)
-    self.view.left_drawer.update_materials()
+    
+    if self.view.left_drawer is not None:
+      self.view.left_drawer.update_materials()
 
   def update_material(self, obj, index):
     '''updates the material list with obj(the material) '''
     self.model.material.material_list.pop(index)
     obj[0] = self.namecheck_material(self.model.material.get_material_list(),obj[0])
     self.model.material.material_list.insert(index,obj)
-    self.view.left_drawer.update_materials()
+    if self.view.left_drawer is not None:
+      self.view.left_drawer.update_materials()
     ui.timer(0, lambda: self.project.localmaterial_save(), once=True)
     
     
@@ -267,8 +274,9 @@ class Controller:
     async def pathed():
       dialogOpen.close()
       print(json)
-      await self.project.importer.import_material_list(json,self)
-      self.view.left_drawer.update_materials()
+      await self.project.importer.import_material_list(json)
+      if self.view.left_drawer is not None:
+        self.view.left_drawer.update_materials()
 
     async def handle_upload(e: events.UploadEventArguments):
       nonlocal json
@@ -334,7 +342,8 @@ class Controller:
         else:
           ui_objects.append((i.name, i.__class__.__name__, i.color))
       self.view.main_section.update(ui_objects[:1])
-    self.view.left_drawer.update(ui_objects[1:])
+    if self.view.left_drawer is not None:
+      self.view.left_drawer.update(ui_objects[1:])
     
     #ui.timer(0, lambda: self.view.right_drawer.update_drawer(), once=True)
     #The above line will not work at this moment. It should be used to clear the right panel after making changes. 
@@ -426,7 +435,8 @@ class Controller:
 
     color = getattr(detector_obj, 'color', None)
 
-    self.view.left_drawer.scrollarea_add_Object((name, f"{detector_obj.__class__.__name__}"))
+    if self.view.left_drawer is not None:
+      self.view.left_drawer.scrollarea_add_Object((name, f"{detector_obj.__class__.__name__}"))
 
     self.view.main_section.add_object((name, obj_type, shape, pos, color))
 

@@ -1,9 +1,9 @@
 import fdtdx
-from model import Model
+from .model import Model
 
 print("\n===== SIMPLE CREATION TESTS =====\n")
 
-model = Model()
+model = Model([])
 
 
 # ==========================================================
@@ -26,7 +26,7 @@ print()
 
 print("-> Creating Uniform Plane Source...")
 
-src_uniform = model.create_plane_source_obj(
+src_uniform = model.create_mode_plane_source_obj(
     name="UniformSource",
     direction=(1,0,0),
     azimuth_angle=30,

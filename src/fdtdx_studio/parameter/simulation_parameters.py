@@ -1,7 +1,14 @@
+from typing import Literal, cast
+
 import jax
 import fdtdx
+import jax.numpy as jnp
 from fdtdx_studio.parameter.DType import DType
 
+DTYPE_MAP = {
+    "jax.numpy.float32": jnp.float32,
+    "jax.numpy.float64": jnp.float64
+}
 class simulation_parameters:
   """Class for the needed simulation Parameters"""
 
@@ -36,14 +43,14 @@ class simulation_parameters:
     """set courant factor to the given value"""
     self.courant_factor = courant_factor
 
-
+  
   def config(self):
     """FDTDX method for Parameters"""
     return fdtdx.SimulationConfig(
       time= self.time,
       resolution= self.resolution,
-      backend= self.backend,
-      dtype= self.dtype.value,
+      backend= cast(Literal["gpu", "tpu", "cpu", "METAL"], self.backend),
+      dtype= DTYPE_MAP[self.dtype.value],
       courant_factor= self.courant_factor,
       gradient_config= self.gradient_config,
     )

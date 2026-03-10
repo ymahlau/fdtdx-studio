@@ -1,5 +1,7 @@
 from nicegui import ui
 from pathlib import Path
+
+from sphinx.project import Project
 from fdtdx_studio.parameter.DType import DType
 import json
 from fdtdx_studio.parameter.datatypes.model import Model
@@ -212,41 +214,45 @@ class Import:
 
 
   #iterates over every object in the JSON and calls the correct importer for each
-  def import_objects(self, Project: ui.upload.FileUpload):
+  async def import_objects(self, Project: ui.upload.FileUpload):
+    file_bytes = await Project.read()
+    project_data = json.loads(file_bytes.decode('utf-8'))
+
     pml_imported = False
     # As we create new PMLs that willhave different names, we need to delete their existing constraints from the import
     delete_constraint = []
 
     constraints = []
-    for i in range(2, len(Project)):
-      type = Project[i]['__name__']
+    for item in project_data:
+      type = item['__name__']
       match type:
-        case 'UniformMaterialObject': self.import_UMO(Project[i])
+        case 'UniformMaterialObject': self.import_UMO(item)
         case 'EnergyDetector' | 'FieldDetector' | 'ModeOverlapDetector' | 'PhasorDetector' | 'PoyntingFluxDetector':
-          self.import_Detector(Project[i])
-        case 'ModePlaneSource' | 'GaussianPlaneSource': self.import_Source(Project[i])
+          self.import_Detector(item)
+        case 'ModePlaneSource' | 'GaussianPlaneSource': self.import_Source(item)
         case 'SizeConstraint' | 'PositionConstraint' | 'SizeExtensionConstraint' | 'GridCoordinateConstraint':
-          if Project[i]['object'] not in delete_constraint:
-            constraints.append(self.import_constraint(Project[i]))
+          if item['object'] not in delete_constraint:
+            constraints.append(self.import_constraint(item))
         case 'PerfectlyMatchedLayer':
-          delete_constraint.append(Project[i]['name'])
+          delete_constraint.append(item['name'])
 
           # There is only one PML consisting of 6 sides (each side is an own object), but instead of importing 6 objects, we create a new PML here
           # (this is also why we need to delete existing constraints that refer to the old PML objects)
           if pml_imported == False:
             pml_imported = True
-            self.project.model.create_pml_boundary_obj(Project[i]['partial_grid_shape']['__value__'][0])
+            self.project.model.create_pml_boundary_obj(item['partial_grid_shape']['__value__'][0])
     self.project.model.list_to_constraints(constraints)
 
 
   #gets the complete JSON as a dictionary, extracts the Simulation Config and Simulation Volume, calls the importer for all other objects
-  def import_from(self, Project: ui.upload.FileUpload):
+  async def import_from(self, Project: ui.upload.FileUpload):
     """Opens Project from existing File"""
     self.project.objects =[None]
     self.project.model = Model(self.project.objects)
-    
-    config = Project[0]
-    volume = Project[1]
+    file_bytes = await Project.read()
+    project_data = json.loads(file_bytes.decode('utf-8'))
+    config = project_data[0]
+    volume = project_data[1]
 
     self.project.model.create_simulation_volume(
       xyz= volume['partial_real_shape']['__value__'],
@@ -257,7 +263,7 @@ class Import:
                                                                        name= volume['material'].get('__name__', 'Unknown Material') )
       )
 
-    self.import_objects(Project)
+    await self.import_objects(Project)
     self.project.param.set_backend(config['backend'])
     self.project.param.set_time(config['time'])
     self.project.param.set_resolution(config['resolution'])

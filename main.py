@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 import pathlib
 from dataclasses import dataclass
+from typing import Any
 
 from nicegui import ui
 from fdtdx_studio.controller.main_controller import Controller
@@ -148,7 +149,7 @@ if __name__ == "__main__":
     opts.favicon = resolve_favicon(opts)
 
     # Build the kwargs dict for ui.run(), dropping None-valued TLS keys
-    run_kwargs = dict(
+    run_kwargs = dict[str, Any](
         title                 = opts.title,
         favicon               = opts.favicon,
         port                  = opts.port,

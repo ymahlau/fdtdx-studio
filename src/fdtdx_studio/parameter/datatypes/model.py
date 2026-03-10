@@ -36,7 +36,7 @@ class Model(Constraints):
   # Just makes a Uniform Material Object for now
   # TODO depricate
     def create_new_dict(self, name, length, width, height):
-        obj = UniformMaterialObject(partial_real_shape=(height,width,length), name=name, partial_real_position=(0,0,0))
+        obj = UniformMaterialObject(partial_real_shape=(height,width,length), name=name, partial_real_position=(0,0,0)) # type: ignore
 
     def get_track_object_list(self):
         return self.track_object_list
@@ -144,13 +144,13 @@ class Model(Constraints):
             self.track_object_list.append(obj)
         return obj
     
-    def create_pml_boundary_obj(self, thickness=None):
+    def create_pml_boundary_obj(self, thickness=int):
         
         # Remove existing PML boundaries
         for obj in list(self.track_object_list):
             if isinstance(obj, fdtdx.PerfectlyMatchedLayer):
                 self.delete_by_object(obj)
-
+        assert isinstance(thickness, int)
         bound_cfg = fdtdx.BoundaryConfig.from_uniform_bound(thickness=thickness, boundary_type="pml")
         bound_dict, c_list = fdtdx.boundary_objects_from_config(bound_cfg, self.track_object_list[0])
         
@@ -503,7 +503,7 @@ class Model(Constraints):
     def get_all_dimensions(self, config):
         config = SimulationConfig(**config)
         #resolve_object_constraints returns 2 dicts, one with 3 slices per object for its dimenstions, and one with error messages per object
-        objs, errors = fdtdx.resolve_object_constraints(objects=self.track_object_list, constraints=self.constraints.values(), config=config)
+        objs, errors = fdtdx.resolve_object_constraints(objects=self.track_object_list, constraints=list(self.constraints.values()), config=config)
         if not all(e is None for e in errors.values()):
             raise Exception([k for k,v in errors.items() if v is not None])
         # Make 0,0,0 the center of the simulation volume in our scene

@@ -3,6 +3,18 @@ from pathlib import Path
 import fdtdx
 import json
 
+from fdtdx.objects.static_material.static import UniformMaterialObject
+from fdtdx.objects.sources.mode import ModePlaneSource
+from fdtdx.objects.sources.profile import SingleFrequencyProfile
+from fdtdx.objects.sources.linear_polarization import GaussianPlaneSource
+from fdtdx.objects.detectors.energy import EnergyDetector
+from fdtdx.objects.detectors.field import FieldDetector
+from fdtdx.objects.detectors.mode import ModeOverlapDetector
+from fdtdx.objects.detectors.phasor import PhasorDetector
+from fdtdx.objects.detectors.poynting_flux import PoyntingFluxDetector
+from fdtdx.objects.boundaries.perfectly_matched_layer import PerfectlyMatchedLayer
+from fdtdx.conversion.json import export_json
+
 #Contains all functions responsible for building and exporting the contents of the scene into JSON Files
 class Export:
 
@@ -35,20 +47,16 @@ class Export:
 		cfg.append(self.build_Volume(self.project.objects[0]))
 		for obj in self.project.objects[1:]:
 			match type(obj):
-				case fdtdx.objects.static_material.static.UniformMaterialObject:
+				case UniformMaterialObject():
 					cfg.append(self.build_Object(obj))
-				case fdtdx.objects.sources.mode.ModePlaneSource:
+				case ModePlaneSource():
 					cfg.append(self.build_source(obj))
-				case fdtdx.objects.sources.linear_polarization.GaussianPlaneSource:
+				case GaussianPlaneSource():
 					cfg.append(self.build_source(obj))
-				case (fdtdx.objects.detectors.energy.EnergyDetector | 
-					fdtdx.objects.detectors.field.FieldDetector | 
-					fdtdx.objects.detectors.mode.ModeOverlapDetector | 
-					fdtdx.objects.detectors.phasor.PhasorDetector | 
-					fdtdx.objects.detectors.poynting_flux.PoyntingFluxDetector):
+				case EnergyDetector() | FieldDetector() | ModeOverlapDetector() | PhasorDetector() | PoyntingFluxDetector():
 					cfg.append(self.build_detector(obj))
-				case fdtdx.objects.boundaries.perfectly_matched_layer.PerfectlyMatchedLayer:
-					cfg.append(fdtdx.conversion.json.export_json(obj))
+				case PerfectlyMatchedLayer():
+					cfg.append(export_json(obj))
 		if self.project.model.constraints:
 			for key, value in self.project.model.constraints.items():
 				cfg.append(self.build_constraint(key, value))
@@ -118,7 +126,7 @@ class Export:
 			"color": {
 				"__module__": "builtins",
 				"__name__": "tuple",
-				"__value__": self.hex_to_RGB(Object.color)
+				"__value__": self.hex_to_RGB(Object.color) if isinstance(Object.color, str) else Object.color
 			},
 			"material": {
 				"__module__": "fdtdx.materials",
@@ -157,16 +165,16 @@ class Export:
 	def build_material(self, obj: fdtdx.Material):
 		return {
 			"__module__": "fdtdx.materials",
-			"__name__": obj[0],
-			"electric_conductivity": obj[1].electric_conductivity,
-			"magnetic_conductivity": obj[1].magnetic_conductivity,
-			"permeability": obj[1].permeability,
-			"permittivity": obj[1].permittivity
+			"__name__": obj,
+			"electric_conductivity": obj.electric_conductivity,
+			"magnetic_conductivity": obj.magnetic_conductivity,
+			"permeability": obj.permeability,
+			"permittivity": obj.permittivity
 		}
 
 	# Builds JSON text for sources with only the options expected for each type
 	def build_source(self, obj):
-		is_mode_source = isinstance(obj, fdtdx.objects.sources.mode.ModePlaneSource)
+		is_mode_source = isinstance(obj, ModePlaneSource)
 		
 		ret = {
 			"__module__": "fdtdx.objects.sources.mode" if is_mode_source else "fdtdx.objects.sources.linear_polarization",
@@ -175,7 +183,7 @@ class Export:
 			"color": {
 				"__module__": "builtins",
 				"__name__": "tuple",
-				"__value__": self.hex_to_RGB(self.hex_to_RGB(obj.color))
+				"__value__": self.hex_to_RGB(obj.color) if isinstance(obj.color, str) else obj.color
 			},
 			"direction": obj.direction,
 			"elevation_angle": obj.elevation_angle,
@@ -229,7 +237,7 @@ class Export:
 			}
 		})
 
-		if isinstance(obj.temporal_profile, fdtdx.objects.sources.profile.SingleFrequencyProfile):
+		if isinstance(obj.temporal_profile, SingleFrequencyProfile):
 			ret.update({
 				"temporal_profile": {
 					"__module__": "fdtdx.objects.sources.profile",
@@ -268,40 +276,40 @@ class Export:
 		types = type(obj)
 		result = {}
 		match types:
-			case fdtdx.objects.detectors.energy.EnergyDetector:
+			case EnergyDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.energy",
 												"__name__": "EnergyDetector",
 												"aggregate": obj.aggregate,
 												"as_slices": obj.as_slices})
-			case fdtdx.objects.detectors.field.FieldDetector:
+			case FieldDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.field",
 												"__name__": "FieldDetector"})
-			case fdtdx.objects.detectors.mode.ModeOverlapDetector:
+			case ModeOverlapDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.mode",
 												"__name__": "ModeOverlapDetector"})
-			case fdtdx.objects.detectors.phasor.PhasorDetector:
+			case PhasorDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.phasor",
 												"__name__": "PhasorDetector"})
-			case fdtdx.objects.detectors.poynting_flux.PoyntingFluxDetector:
+			case PoyntingFluxDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.flux",
 												"__name__": "PoyntingFluxDetector"})
 
 		result.update({"color": {
 			"__module__": "builtins",
 			"__name__": "tuple",
-			"__value__": self.hex_to_RGB(self.hex_to_RGB(obj.color))
+			"__value__": self.hex_to_RGB(obj.color) if isinstance(obj.color, str) else obj.color
 			}})
 
 		match types:
-			case fdtdx.objects.detectors.energy.EnergyDetector:
+			case EnergyDetector():
 				None
-			case fdtdx.objects.detectors.field.FieldDetector | fdtdx.objects.detectors.phasor.PhasorDetector:
+			case FieldDetector() | PhasorDetector():
 				result.update({"components": {
 					"__module__": "builtins",
 					"__name__": "tuple",
 					"__value__": obj.components 
 				}})
-			case fdtdx.objects.detectors.mode.ModeOverlapDetector | fdtdx.objects.detectors.poynting_flux.PoyntingFluxDetector:
+			case ModeOverlapDetector() | PoyntingFluxDetector():
 				result.update({"direction": obj.direction})
 
 		result.update({"dtype": {
@@ -310,11 +318,11 @@ class Export:
 										"exact_interpolation": obj.exact_interpolation})
 
 		match types:
-			case fdtdx.objects.detectors.mode.ModeOverlapDetector:
+			case ModeOverlapDetector():
 				result.update({"filter_pol": obj.filter_pol,
 											"if_inverse_plot_backwards": obj.if_inverse_plot_backwards,
 											"inverse": obj.inverse})
-			case fdtdx.objects.detectors.poynting_flux.PoyntingFluxDetector:
+			case PoyntingFluxDetector():
 				result.update({"fixed_propagation_axis": obj.fixed_propagation_axis,
 											"if_inverse_plot_backwards": obj.if_inverse_plot_backwards,
 											"inverse": obj.inverse,
@@ -336,7 +344,7 @@ class Export:
 													obj.max_random_real_offsets
 											}})
 		
-		if isinstance(types, fdtdx.objects.detectors.mode.ModeOverlapDetector):
+		if isinstance(types, ModeOverlapDetector):
 			result.update({"mode_index": obj.mode_index})
 		
 		result.update({"name": obj.name,
@@ -357,13 +365,13 @@ class Export:
 											"__value__": obj.partial_real_position
 										}})
 		
-		if not isinstance(types, fdtdx.objects.detectors.mode.ModeOverlapDetector):
+		if not isinstance(types, ModeOverlapDetector):
 			result.update({"plot": obj.plot})
 		
 		result.update({"plot_dpi": obj.plot_dpi,
 										"plot_interpolation": obj.plot_interpolation})
 		
-		if not isinstance(types, fdtdx.objects.detectors.mode.ModeOverlapDetector):
+		if not isinstance(types, ModeOverlapDetector):
 			result.update({"reduce_volume": obj.reduce_volume})
 
 		result.update({
@@ -383,18 +391,18 @@ class Export:
 									}})
 		
 		match types:
-			case fdtdx.objects.detectors.energy.EnergyDetector:
+			case EnergyDetector():
 				result.update({"x_slice": obj.x_slice,
 											"y_slice": obj.y_slice,
 											"z_slice": obj.z_slice})
-			case fdtdx.objects.detectors.mode.ModeOverlapDetector | fdtdx.objects.detectors.phasor.PhasorDetector:
+			case FieldDetector() | PhasorDetector():
 				result.update({"wave_characters": {
 											"__module__": "builtins",
 											"__name__": "list",
 											"__value__": obj.wave_characters
 										}})
 			case _:
-				None
+				pass
 					
 		return result
 	

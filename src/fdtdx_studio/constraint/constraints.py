@@ -6,22 +6,22 @@ class Constraints:
   _cons = 0
 
   #Functions to add Constraints
-  def uniqueName(self, key:str=None):
+  def uniqueName(self, key:str| None=None):
     self._cons+=1
     return key if key and "new_" not in key else f"Constraint_{self._cons}"
   def add_pos_con(self, obj: str, other_object:str, axes:tuple[int, ...], object_positions:tuple[float, ...],
-                  other_object_positions:tuple[float, ...], margins:tuple[float, ...]=None, grid_margins:tuple[int, ...]=None, key:str=None):
+                  other_object_positions:tuple[float, ...], margins:tuple[float, ...] = (), grid_margins:tuple[int, ...] = (), key:str | None=None):
     new = {self.uniqueName(key):PositionConstraint(object=obj, other_object=other_object, axes=axes,object_positions=object_positions,other_object_positions=other_object_positions,margins=margins,grid_margins=grid_margins)}
     self.constraints.update(new)
   def add_size_con(self,  obj: str, other_object:str, axes:tuple[int, ...], other_axes:tuple[int, ...],
-                  proportions:tuple[float, ...], offsets:tuple[float, ...], grid_offset:tuple[int, ...], key:str=None):
+                  proportions:tuple[float, ...], offsets:tuple[float, ...], grid_offset:tuple[int, ...], key:str | None=None):
     new ={self.uniqueName(key):SizeConstraint(object=obj,other_object=other_object,axes=axes,other_axes=other_axes,proportions=proportions,offsets=offsets,grid_offsets=grid_offset)}
     self.constraints.update(new)
   def add_size_ex_con(self, obj: str, other_object:str|None, axis:int, direction,
-                  other_position: float, offset:float, grid_offset:int, key:str=None):
+                  other_position: float, offset:float, grid_offset:int, key:str | None=None):
     new = {self.uniqueName(key):SizeExtensionConstraint(object=obj, other_object=other_object, axis=axis, direction=direction,other_position=other_position,offset=offset,grid_offset=grid_offset)}
     self.constraints.update(new)
-  def add_grid_con(self, obj: str, axes:tuple[int,...], sides, coordinates: tuple[int, ...], key:str=None):
+  def add_grid_con(self, obj: str, axes:tuple[int,...], sides, coordinates: tuple[int, ...], key:str | None=None):
     new = {self.uniqueName(key):GridCoordinateConstraint(object=obj,axes=axes,sides=sides,coordinates=coordinates)}
     self.constraints.update(new)
   #Deletes a given Constraint

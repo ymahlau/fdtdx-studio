@@ -8,7 +8,7 @@ class simulation_parameters_panel():
     self.drawer = drawer
     self.controller = controller
     
-  def simulation_param_panel(self, dialog: ui.dialog = None):
+  def simulation_param_panel(self, dialog: ui.dialog | None = None):
      
       
       ui.label('Simulation Parameters').style('font-size: 18px; margin-bottom: 8px; font-weight: bold;')

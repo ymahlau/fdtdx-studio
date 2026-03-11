@@ -121,11 +121,11 @@ class SourcePanel(ObjectConfigPanel):
           self.temporal_profile_type = self.temporal_profile_button.value
         
         if self.temporal_profile_type == 'SingleFrequencyProfile':
-          self.temp_profile_value1.label = 'Phase Shift'
-          self.temp_profile_value2.label = 'Num of Startup Periods'
+          if self.temp_profile_value1: self.temp_profile_value1.label = 'Phase Shift'
+          if self.temp_profile_value2: self.temp_profile_value2.label = 'Num of Startup Periods'
         elif self.temporal_profile_type == 'GaussianPulseProfile':
-          self.temp_profile_value1.label = 'Center Frequency'
-          self.temp_profile_value2.label = 'Spectral Width'
+          if self.temp_profile_value1: self.temp_profile_value1.label = 'Center Frequency'
+          if self.temp_profile_value2: self.temp_profile_value2.label = 'Spectral Width'
 
       
   def set_wave(self, wave):
@@ -134,10 +134,12 @@ class SourcePanel(ObjectConfigPanel):
     param wave: The type of wave character to set. Either 'Wavelength', 'Period', or 'Frequency'.
     type wave: str
     """
-    self.wave_value.label = f'{wave} Value'
-    self.wave_button.close()
+    if self.wave_value:
+      self.wave_value.label = f'{wave} Value'
+    if self.wave_button:
+      self.wave_button.close()
+      self.wave_button.text = f'{wave}'
     self.wave = wave
-    self.wave_button.text = f'{wave}'
 
   def get_parameters(self): 
         """
@@ -146,7 +148,7 @@ class SourcePanel(ObjectConfigPanel):
         :rtype: dict
         """
         parameters = super().get_parameters()
-        parameters['direction'] = self.direction.value
+        parameters['direction'] = self.direction.value if self.direction else None
         parameters['azimuth_angle'] = self.azimuth_angle.value if self.azimuth_angle else None
         parameters['elevation_angle'] = self.elevation_angle.value if self.elevation_angle else None
         parameters['max_angle_random_offset'] = self.max_angle_random_offset.value if self.max_angle_random_offset else None
@@ -157,11 +159,11 @@ class SourcePanel(ObjectConfigPanel):
             'type': self.temporal_profile_type,
         }
         if self.temporal_profile_type == 'SingleFrequencyProfile':
-          parameters['temporal_profile']['phase_shift'] = self.temp_profile_value1.value
-          parameters['temporal_profile']['num_startup_periods'] = self.temp_profile_value2.value
+          parameters['temporal_profile']['phase_shift'] = self.temp_profile_value1.value if self.temp_profile_value1 else None
+          parameters['temporal_profile']['num_startup_periods'] = self.temp_profile_value2.value if self.temp_profile_value2 else None
         elif self.temporal_profile_type == 'GaussianPulseProfile':
-          parameters['temporal_profile']['center_frequency'] = self.temp_profile_value1.value
-          parameters['temporal_profile']['spectral_width'] = self.temp_profile_value2.value
+          parameters['temporal_profile']['center_frequency'] = self.temp_profile_value1.value if self.temp_profile_value1 else None
+          parameters['temporal_profile']['spectral_width'] = self.temp_profile_value2.value  if self.temp_profile_value2 else None
         else:
           raise ValueError(f"Unknown temporal profile type: {self.temporal_profile_type}")
         # Switch parameters
@@ -174,11 +176,14 @@ class SourcePanel(ObjectConfigPanel):
             }
         match self.wave:
           case 'Frequency':
-            parameters['wave_character']['frequency'] = self.wave_value.value 
+            if self.wave_value:
+              parameters['wave_character']['frequency'] = self.wave_value.value
           case 'Period':
-            parameters['wave_character']['period'] = self.wave_value.value
+            if self.wave_value:
+              parameters['wave_character']['period'] = self.wave_value.value
           case 'Wavelength':
-            parameters['wave_character']['wavelength'] = self.wave_value.value
+            if self.wave_value:
+              parameters['wave_character']['wavelength'] = self.wave_value.value
         
         return parameters
 
@@ -221,20 +226,23 @@ class SourcePanel(ObjectConfigPanel):
               self.set_wave_phase_shift(wave_char.phase_shift)
           if wave_char.period is not None:
               self.set_wave('Period')
-              self.wave_value.value = wave_char.period
+              if self.wave_value:
+                self.wave_value.value = wave_char.period
           elif wave_char.wavelength is not None:
               self.set_wave('Wavelength') 
-              self.wave_value.value = wave_char.wavelength
+              if self.wave_value:
+                self.wave_value.value = wave_char.wavelength
           elif wave_char.frequency is not None:
               self.set_wave('Frequency')
-              self.wave_value.value = wave_char.frequency
+              if self.wave_value:
+                self.wave_value.value = wave_char.frequency
 
       
       if self.switch and'switch' in parameters:
           
           self.switch.update_values(parameters['switch'])
 
-  def _validate_float(self, value):
+  def _validate_float(self, value) -> str | None:
       """Validation function to check if input is a float or empty."""
       try:
           float(value)

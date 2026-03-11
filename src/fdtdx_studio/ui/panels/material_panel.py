@@ -78,7 +78,7 @@ class Material_panel(ObjectConfigPanel):
     with panel:
       with ui.column().classes('w-full gap-2 p-2'):
           
-        name = ui.input(value=self.name).classes('w-full').bind_enabled_from(self, 'is_readonly', backward=lambda x: not x)
+        name = ui.input(value=self.name if isinstance(self.name, str) else '').classes('w-full').bind_enabled_from(self, 'is_readonly', backward=lambda x: not x)
 
         ui.label('Permittivity').style('font-size: 13px; font-weight: bold;')
         with ui.row().classes('w-full flex-nowrap gap-1'):

@@ -1,5 +1,5 @@
 from nicegui import events, ui
-from fdtdx_studio.ui import ui_view as View
+from fdtdx_studio.ui.ui_view import View
 from fdtdx_studio.project.project import Project
 import fdtdx
 
@@ -9,7 +9,7 @@ class Project_Dialog_Controller:
     self.view = view
     self.controller = controller
 
-  async def new_scene_controller(self, project: Project = None):
+  async def new_scene_controller(self, project: Project | None = None):
     """handles the different Dialog Windows when opening or importing Projects"""
     if project is None:
       project = Project(controller= self.controller)
@@ -42,8 +42,16 @@ class Project_Dialog_Controller:
         def update_button():
           save.enabled = path.value
         ui.label('Where would you like the Project saved')
-        path = ui.input(label= 'Path', placeholder= 'Unnamed Project', on_change= lambda e: (self.view.project.set_name(e.value), update_button()))
-        save = ui.button(text= 'Save', on_click= lambda: self.view.project.save_Project()).on_click(Saved)
+        def handle_name_change(e):
+          if self.view.project is not None:
+            self.view.project.set_name(e.value)
+          update_button()
+        
+        def handle_save():
+          if self.view.project is not None:
+            self.view.project.save_Project()
+        path = ui.input(label= 'Path', placeholder= 'Unnamed Project', on_change= handle_name_change)
+        save = ui.button(text= 'Save', on_click= handle_save).on_click(Saved)
         ui.button(text= 'Cancel', on_click= dialogSaveWhere.close)
         update_button()
 
@@ -52,7 +60,7 @@ class Project_Dialog_Controller:
       self.Config_Dialog()
 
     def on_Save(): #Saves the Project to current path. IF no Path, ask for Path
-      if self.view.project.name is not None:
+      if self.view.project is not None and self.view.project.name is not None:
         self.view.project.save_Project()
         self.controller.open_Project(project)
         on_dialog_closed()
@@ -124,6 +132,8 @@ class Project_Dialog_Controller:
 
     # config dialog for starting new project 
     def actual_config_dialog():
+      assert self.view.left_drawer is not None
+      assert self.view.right_drawer is not None
       self.view.left_drawer.Volume_Panel.Volume_panel()
       with ui.dialog() as dialogFirstConfig, ui.card():
         self.view.right_drawer.simparpanel.simulation_param_panel(dialogFirstConfig)

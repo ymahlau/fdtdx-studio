@@ -1,3 +1,5 @@
+import asyncio
+
 from nicegui import ui
 from fdtdx_studio.parameter import simulation_parameters
 from fdtdx_studio.json_handling.Export import Export
@@ -9,7 +11,7 @@ import json
 class Project:
   """Class for the Project. All Parameters and objects are gathered here to Save the Project in the end"""
 
-  def __init__(self, controller, Name:str = None, File: ui.upload.FileUpload = None):
+  def __init__(self, controller, Name:str | None = None, File: ui.upload.FileUpload | None = None):
     """Initializes a new Project. If a Name is given, it opens the Project from an existing File"""
     self.projectstoragekey = "FDTDX_data"
     self.materialstoragekey = "FDTDX_material"
@@ -21,9 +23,9 @@ class Project:
     self.model.constraints.clear()
     #self.objects = self.model.track_object_list
     self.param = simulation_parameters.simulation_parameters()
-    self.name: str = None
+    self.name: str | None= None
     if File is not None:
-      self.importer.import_from(File)
+      asyncio.create_task(self.importer.import_from(File))
       self.name = Name
     else:
         self.model.create_simulation_volume()
@@ -102,7 +104,7 @@ class Project:
                 console.warn('Could not save to localStorage:', error);
             }}
             """,
-            timeout=None,
+            
         )
     
     # loads the last used scene from the browser localstorage
@@ -119,7 +121,6 @@ class Project:
                 return {{}};
             }}
         """,
-            timeout=None,
         )
     # checks if teh localstorage was empty
     if (len(importProject)>0):
@@ -151,7 +152,6 @@ class Project:
                 console.warn('Could not save to localStorage:', error);
             }}
         """,
-            timeout=None,
         )
   
   # loads the list of custom materials from the browser localstorage
@@ -167,7 +167,6 @@ class Project:
                 return {{}};
             }}
         """,
-            timeout=None,
         )
     if (len(importMaterial)>0):
       try:

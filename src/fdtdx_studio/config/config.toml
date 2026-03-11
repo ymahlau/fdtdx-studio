@@ -1,0 +1,15 @@
+# config.toml FDTDX server options
+[ui]
+title = "FDTDX Builder"
+favicon = "src/config/fdtdx.svg"    # Page Icon
+port = 8080
+host = "0.0.0.0"               # optional – bind address
+dark = false                    # `null` → let NiceGUI decide (or true/false)
+reconnect_timeout = 3.0
+show = false
+reload = true
+uvicorn_logging_level = "warning" # server log level
+
+# You can add any options later needed for ui.run here:
+# ssl_keyfile = "path/to/key.pem"
+# ssl_certfile = "path/to/cert.pem"

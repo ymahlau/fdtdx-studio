@@ -6,7 +6,7 @@ Configure the server via CLI flags or by editing the UIConfig defaults below.
 CLI examples
 ------------
     python main.py
-    python main.py --port 9090 --dark --no-reload
+    python main.py --port 9090 --no-reload
     python main.py --host 127.0.0.1 --title "My Sim"
     python main.py --dry-run          # print resolved config, don't start
 """
@@ -28,7 +28,8 @@ class UIConfig:
     favicon: str                 = "src/fdtdx_studio/fdtdx.svg"
     port: int                    = 8080
     host: str                    = "127.0.0.1"
-    dark: Optional[bool]         = None   # None = NiceGUI decides, True/False forces it
+    # TODO later change to dark=None when we support dark mode
+    dark: Optional[bool]         = False  # None = NiceGUI decides, True/False forces it
     reconnect_timeout: float     = 3.0
     show: bool                   = False
     reload: bool                 = False

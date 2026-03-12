@@ -122,16 +122,40 @@ def _parse_args(argv: list[str] | None = None) -> tuple[UIConfig, bool]:
     return cfg, ns.dry_run
 
 
-# Page registration (module level)
+# App
 
-from nicegui import ui                                            # deferred – but module-level
-from fdtdx_studio.controller.main_controller import Controller
-# from fdtdx_studio.ui.ui_view import View  # uncomment if needed
+def _register_pages() -> None:
+    """Import NiceGUI + app code and register all routes.
+
+    Kept in a function so the import-time side effects of NiceGUI and the
+    controller only fire when we actually intend to run the server — never on
+    a dry-run or a plain ``import main``.
+
+    Called in two places:
+      1. _run()  – by the parent process, just before ui.run().
+      2. The reload-worker hook below – by uvicorn worker processes that
+         re-import this module from scratch and therefore never reach main().
+    """
+    from nicegui import ui                                        # noqa: PLC0415
+    from fdtdx_studio.controller.main_controller import Controller  # noqa: PLC0415
+    # from fdtdx_studio.ui.ui_view import View  # uncomment if needed
+
+    @ui.page("/")
+    def index():
+        Controller()
 
 
-@ui.page("/")
-def index():
-    Controller()
+def _run(cfg: UIConfig) -> None:
+    _register_pages()
+    from nicegui import ui
+    ui.run(**cfg.to_nicegui_kwargs())
+
+
+# Reload-worker hook
+
+import os as _os
+if _os.environ.get("NICEGUI_WORKER"):
+    _register_pages()
 
 
 # Entry point
@@ -148,7 +172,7 @@ def main(argv: list[str] | None = None) -> None:
             print(f"  {k:<28} = {v!r}")
         sys.exit(0)
 
-    ui.run(**cfg.to_nicegui_kwargs())
+    _run(cfg)
 
 
 if __name__ == "__main__":

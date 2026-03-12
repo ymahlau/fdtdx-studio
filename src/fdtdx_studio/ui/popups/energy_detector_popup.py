@@ -103,6 +103,12 @@ class EnergyDetectorPopup(BaseDetectorPopup):
             if isinstance(val, str) and val.strip() == '':
                 return None
             return val
+        
+        assert self.input_as_slices is not None
+        assert self.input_reduce_volume is not None
+        assert self.input_x_slice is not None
+        assert self.input_y_slice is not None
+        assert self.input_z_slice is not None
 
         return {
             'as_slices': bool(self.input_as_slices.value),
@@ -130,9 +136,13 @@ class EnergyDetectorPopup(BaseDetectorPopup):
         super().close_self()
 
         # Reset EnergyDetector-specific fields
+        assert self.input_as_slices is not None
+        assert self.input_reduce_volume is not None 
         self.input_as_slices.value = False
         self.input_reduce_volume.value = False
-
+        assert self.input_x_slice is not None
+        assert self.input_y_slice is not None
+        assert self.input_z_slice is not None
         self.input_x_slice.value = None
         self.input_y_slice.value = None
         self.input_z_slice.value = None

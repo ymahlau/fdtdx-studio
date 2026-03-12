@@ -108,6 +108,7 @@ class DetectorPopup:
         Switches between detector types.
         """
         if detector_type == self.current_type:
+            assert self.type_button is not None
             self.type_button.close()
             return
 
@@ -123,6 +124,7 @@ class DetectorPopup:
         setattr(self.current_popup, '_dialog_owner', self.dialog)
 
         # Update dropdown label
+        assert self.type_button is not None
         self.type_button.text = f'Type: {detector_type}'
         self.type_button.close()
 
@@ -140,6 +142,7 @@ class DetectorPopup:
         Called by LeftDrawer.
         """
         # >>> OWNS DIALOG <<<
+        assert self.dialog is not None
         self.dialog.open()
 
     def close(self):
@@ -149,4 +152,5 @@ class DetectorPopup:
         May be called by the controller AFTER successful creation.
         """
         # >>> OWNS DIALOG <<<
+        assert self.dialog is not None
         self.dialog.close()

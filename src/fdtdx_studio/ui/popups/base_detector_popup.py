@@ -60,10 +60,15 @@ class BaseDetectorPopup(NewPopUp):
                     self.build_detector_specific_ui()
                     
         # change standard values of size according to detector standards
+        assert self.input_width is not None
+        assert self.input_length is not None
+        assert self.input_height is not None
+
         self.input_width.value = 10e-6
         self.input_length.value = 10e-6
         self.input_height.value = 0
         #Makes Sure teh first detector is also named New Detector
+        assert self.input_name is not None
         self.input_name.value = 'New Detector'
         # Button wired to self._call_add() CONTROLLERANBINDUG
         self.add_button(self.button_function, self.button_label)
@@ -88,6 +93,11 @@ class BaseDetectorPopup(NewPopUp):
 
         No logic here, just reading UI state.
         """
+
+        assert self.input_name is not None
+        assert self.input_length is not None
+        assert self.input_width is not None
+        assert self.input_height is not None
         # >>> UI ONLY <<<
         return {
             'name': self.input_name.value,
@@ -142,6 +152,7 @@ class BaseDetectorPopup(NewPopUp):
         # This is the ONLY place where the popup closes the dialog.
         if getattr(self, '_dialog_owner', None) is not None:
             try:
+                assert self._dialog_owner is not None
                 self._dialog_owner.close()
             except Exception:
                 pass
@@ -169,6 +180,12 @@ class BaseDetectorPopup(NewPopUp):
         - does NOT call controller
         """
         # >>> UI ONLY <<<
+        assert self.color_show is not None
+        assert self.input_length is not None
+        assert self.input_width is not None
+        assert self.input_height is not None
+        assert self.input_name is not None
+
         self.color_show.text = 'Color: Red'
         self.input_color = 'Red'
         self.input_length.value = 1

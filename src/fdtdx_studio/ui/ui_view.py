@@ -73,7 +73,7 @@ class View:
     '''
     with ui.header().style('background-color: #17032B').classes('items-center justify-between').style('padding: 0px;') as self.header:
       with ui.row().classes('items-center').style('margin-left: 8px;'):
-        ui.image("src/config/fdtdx.svg").style('height: 24px; width: 24px; margin-left: 16px;')
+        ui.image("src/fdtdx-studio/fdtdx.svg").style('height: 24px; width: 24px; margin-left: 16px;')
         ui.label('FDTDX Builder').style('color: #BE44E4; font-size: 24px; margin-left: 0px; font-weight: bold; align-self: center;')
       with ui.row().classes('items-center justify-end').style('margin-right: 4px;'):
         ui.button(icon= 'help', color = None).props('flat').style('padding: 0px; color:#F3E155;').on_click(lambda: ui.navigate.to('https://fdtdx.readthedocs.io/en/latest/', new_tab= True)) 

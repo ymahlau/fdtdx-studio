@@ -1,3 +1,4 @@
+import re
 from nicegui import ui
 from typing import Callable, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
@@ -111,8 +112,7 @@ class ColorElement(AttributeElement):
         }
 
     def render(self):
-        initial_color = self._normalize_hex(self.value) or '#FF0000'
-        initial_name = self._get_color_name(initial_color)
+        normalized = self._normalize_hex(self.value)
 
         with ui.column().classes('w-full gap-1') as self.element:
             if self.label:
@@ -123,26 +123,26 @@ class ColorElement(AttributeElement):
                 self.color_select = ui.select(
                     options=list(self.preset_colors.keys()),
                     label='Color',
-                    value=initial_name if initial_name in self.preset_colors else None,
+                    value=self._get_color_name(normalized) if normalized in self.preset_colors.values() else None,
                     on_change=lambda e: self.set_color_by_name(e.value),
                 ).classes('w-17')
 
                 # color input
                 self.color_input = ui.color_input(
                     '',
-                    value=initial_color,
+                    value=normalized or '',
                     on_change=lambda e: self.on_color_input_change(e.value),
                 ).classes('w-30')
 
                 # color preview
                 self.color_preview = ui.html(
-                    self._preview_html(initial_color)
+                    self._preview_html(normalized)
                 ).classes('shrink-0')
 
         if self.tooltip:
             self.element.tooltip(self.tooltip)
 
-        self.value = initial_color
+        self.value = normalized if normalized is not None else self.value
         return self.element
 
     def set_color_by_name(self, color_name: str):
@@ -158,48 +158,95 @@ class ColorElement(AttributeElement):
 
     def _set_color(self, color_hex: str, update_select: bool = True, trigger_callback: bool = True):
         normalized = self._normalize_hex(color_hex)
-        if not normalized:
+        if normalized is None:
+            self._sync_ui_from_value()
             return
 
         self.value = normalized
-
-        if hasattr(self, 'color_input') and self.color_input:
-            self.color_input.value = normalized
-
-        if hasattr(self, 'color_preview') and self.color_preview:
-            self.color_preview.content = self._preview_html(normalized)
-            self.color_preview.update()
-
-        if update_select and hasattr(self, 'color_select') and self.color_select:
-            color_name = self._get_color_name(normalized)
-            self.color_select.value = color_name if color_name in self.preset_colors else None
-            self.color_select.update()
+        self._sync_ui_from_value(update_select=update_select)
 
         if trigger_callback and self.on_change:
             self.on_change(normalized)
 
     def update(self, value: Any):
         normalized = self._normalize_hex(value)
-        if not normalized:
-            return
-        self._set_color(normalized, update_select=True, trigger_callback=False)
 
-    def _get_color_name(self, hex_code: str) -> str:
+        if normalized is None:
+            self.value = value
+            self._sync_ui_invalid()
+            return
+
+        self.value = normalized
+        self._sync_ui_from_value(update_select=True)
+
+    def _sync_ui_from_value(self, update_select: bool = True):
+        normalized = self._normalize_hex(self.value)
+
+        if hasattr(self, 'color_input') and self.color_input:
+            self.color_input.value = normalized or ''
+            self.color_input.update()
+
+        if hasattr(self, 'color_preview') and self.color_preview:
+            self.color_preview.content = self._preview_html(normalized)
+            self.color_preview.update()
+
+        if update_select and hasattr(self, 'color_select') and self.color_select:
+            if normalized and normalized.lower() in self.reverse_preset_colors:
+                self.color_select.value = self.reverse_preset_colors[normalized.lower()]
+            else:
+                self.color_select.value = None
+            self.color_select.update()
+
+    def _sync_ui_invalid(self):
+        if hasattr(self, 'color_input') and self.color_input:
+            self.color_input.value = ''
+            self.color_input.update()
+
+        if hasattr(self, 'color_preview') and self.color_preview:
+            self.color_preview.content = self._preview_html(None)
+            self.color_preview.update()
+
+        if hasattr(self, 'color_select') and self.color_select:
+            self.color_select.value = None
+            self.color_select.update()
+
+    def _get_color_name(self, hex_code: str | None) -> str:
         if not hex_code:
             return 'Color'
         return self.reverse_preset_colors.get(hex_code.lower(), hex_code)
 
     def _normalize_hex(self, hex_code: Any) -> str | None:
+        if hex_code is None:
+            return None
+
+        hex_code = str(hex_code).strip()
         if not hex_code:
             return None
-        hex_code = str(hex_code).strip()
+
         if not hex_code.startswith('#'):
             hex_code = f'#{hex_code}'
-        if len(hex_code) != 7:
+
+        if not re.fullmatch(r'#[0-9A-Fa-f]{6}', hex_code):
             return None
+
         return hex_code.upper()
 
-    def _preview_html(self, color_hex: str) -> str:
+    def _preview_html(self, color_hex: str | None) -> str:
+        if color_hex:
+            background = color_hex
+            extra = ''
+        else:
+            background = 'transparent'
+            extra = '''
+                background-image:
+                    linear-gradient(45deg, #ddd 25%, transparent 25%),
+                    linear-gradient(-45deg, #ddd 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #ddd 75%),
+                    linear-gradient(-45deg, transparent 75%, #ddd 75%);
+                background-size: 12px 12px;
+                background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+            '''
+
         return f'''
         <div style="
             width: 36px;
@@ -208,7 +255,8 @@ class ColorElement(AttributeElement):
             min-height: 36px;
             border-radius: 6px;
             border: 1px solid #ccc;
-            background-color: {color_hex};
+            background-color: {background};
+            {extra}
         "></div>
         '''
 

@@ -137,34 +137,17 @@ class new_pop_up():
           self.name_error.set_visibility(False)
           self.save.enable()
 
-
   def build_dialog(self):
     """Builds the dialog UI for the popup."""
     with ui.dialog() as self.new_pop_up, ui.card():
       with ui.column():
         self.build_common_ui()
-  
-  #helper methods for the popup
-  # def pick_color(self, color, name):
-  #   self.input_color = color
-  #   self.color_show.close()
-  #   self.color_show.text = name
 
   def choose_material(self, material):
     self.input_material = material
 
   def open_new_popup(self):
     self.new_pop_up.open()  
-  
-  # def close_self(self):
-  #   # reset popup values
-  #   self.color_show.text = 'Color: Red'
-  #   self.input_color = '#FF0000'
-  #   self.input_length.value = 1
-  #   self.input_width.value = 1
-  #   self.input_height.value = 1
-  #   self.new_pop_up.close()
-  #   ui.timer( 0,lambda: self.controller.ui_update(), once=True)
 
   def close_self(self):
         self.input_color = '#FF0000'

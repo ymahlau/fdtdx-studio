@@ -93,49 +93,124 @@ class MultiSelectElement(AttributeElement):
 @dataclass
 class ColorElement(AttributeElement):
     """UI element for color selection using a predefined palette."""
+    def __post_init__(self):
+        self.preset_colors = {
+            'Red': '#FF0000',
+            'Green': '#00FF00',
+            'Blue': '#0000FF',
+            'Orange': '#FFA500',
+            'Purple': '#800080',
+            'Cyan': '#00FFFF',
+            'Pink': '#FFC0CB',
+            'Yellow': '#FFFF00',
+            'Gray': '#808080',
+            'Black': '#000000',
+        }
+        self.reverse_preset_colors = {
+            v.lower(): k for k, v in self.preset_colors.items()
+        }
+
     def render(self):
-        with ui.dropdown_button(self.label, auto_close=True).classes('w-full') as self.element:
-             self.element.text = self._get_color_name(self.value)
-             
-             ui.item('Red', on_click=lambda: self._handle_change('#FF0000', 'Red'))
-             ui.item('Green', on_click=lambda: self._handle_change('#00FF00', 'Green'))
-             ui.item('Blue', on_click=lambda: self._handle_change('#0000FF', 'Blue'))
-             ui.item('Orange', on_click=lambda: self._handle_change('#FFA500', 'Orange'))
-             ui.item('Purple', on_click=lambda: self._handle_change('#800080', 'Purple'))
-             ui.item('Cyan', on_click=lambda: self._handle_change('#00FFFF', 'Cyan'))
-             ui.item('Pink', on_click=lambda: self._handle_change('#FFC0CB', 'Pink'))
-             ui.item('Yellow', on_click=lambda: self._handle_change('#FFFF00', 'Yellow'))
-             ui.item('Gray', on_click=lambda: self._handle_change('#808080', 'Gray'))
-             ui.item('Black', on_click=lambda: self._handle_change('#000000', 'Black'))
-        
+        initial_color = self._normalize_hex(self.value) or '#FF0000'
+        initial_name = self._get_color_name(initial_color)
+
+        with ui.column().classes('w-full gap-1') as self.element:
+            if self.label:
+                ui.label(self.label)
+
+            with ui.row().classes('w-full items-end gap-2 no-wrap'):
+                # preset color selection
+                self.color_select = ui.select(
+                    options=list(self.preset_colors.keys()),
+                    label='Color',
+                    value=initial_name if initial_name in self.preset_colors else None,
+                    on_change=lambda e: self.set_color_by_name(e.value),
+                ).classes('w-17')
+
+                # color input
+                self.color_input = ui.color_input(
+                    '',
+                    value=initial_color,
+                    on_change=lambda e: self.on_color_input_change(e.value),
+                ).classes('w-30')
+
+                # color preview
+                self.color_preview = ui.html(
+                    self._preview_html(initial_color)
+                ).classes('shrink-0')
+
         if self.tooltip:
             self.element.tooltip(self.tooltip)
+
+        self.value = initial_color
         return self.element
 
-    def _handle_change(self, color_hex, color_name):
-        self.value = color_hex
-        self.element.text = color_name
-        self.on_change(color_hex)
-        
-    def update(self, value: Any):
-        self.value = value
-        if self.element:
-            self.element.text = self._get_color_name(value)
+    def set_color_by_name(self, color_name: str):
+        if not color_name:
+            return
+        color_hex = self.preset_colors.get(color_name)
+        if not color_hex:
+            return
+        self._set_color(color_hex, update_select=True, trigger_callback=True)
 
-    def _get_color_name(self, hex_code):
-         color_map = {
-            '#FF0000': 'Red', '#ff0000': 'Red',
-            '#00FF00': 'Green', '#00ff00': 'Green',
-            '#0000FF': 'Blue', '#0000ff': 'Blue',
-            '#FFA500': 'Orange', '#ffa500': 'Orange',
-            '#800080': 'Purple', '#800080': 'Purple',
-            '#00FFFF': 'Cyan', '#00ffff': 'Cyan',
-            '#FFC0CB': 'Pink', '#ffc0cb': 'Pink',
-            '#FFFF00': 'Yellow', '#ffff00': 'Yellow',
-            '#808080': 'Gray', '#808080': 'Gray',
-            '#000000': 'Black', '#000000': 'Black'
-        }
-         return color_map.get(hex_code, hex_code or 'Color')
+    def on_color_input_change(self, color_hex: str):
+        self._set_color(color_hex, update_select=True, trigger_callback=True)
+
+    def _set_color(self, color_hex: str, update_select: bool = True, trigger_callback: bool = True):
+        normalized = self._normalize_hex(color_hex)
+        if not normalized:
+            return
+
+        self.value = normalized
+
+        if hasattr(self, 'color_input') and self.color_input:
+            self.color_input.value = normalized
+
+        if hasattr(self, 'color_preview') and self.color_preview:
+            self.color_preview.content = self._preview_html(normalized)
+            self.color_preview.update()
+
+        if update_select and hasattr(self, 'color_select') and self.color_select:
+            color_name = self._get_color_name(normalized)
+            self.color_select.value = color_name if color_name in self.preset_colors else None
+            self.color_select.update()
+
+        if trigger_callback and self.on_change:
+            self.on_change(normalized)
+
+    def update(self, value: Any):
+        normalized = self._normalize_hex(value)
+        if not normalized:
+            return
+        self._set_color(normalized, update_select=True, trigger_callback=False)
+
+    def _get_color_name(self, hex_code: str) -> str:
+        if not hex_code:
+            return 'Color'
+        return self.reverse_preset_colors.get(hex_code.lower(), hex_code)
+
+    def _normalize_hex(self, hex_code: Any) -> str | None:
+        if not hex_code:
+            return None
+        hex_code = str(hex_code).strip()
+        if not hex_code.startswith('#'):
+            hex_code = f'#{hex_code}'
+        if len(hex_code) != 7:
+            return None
+        return hex_code.upper()
+
+    def _preview_html(self, color_hex: str) -> str:
+        return f'''
+        <div style="
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            min-height: 36px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: {color_hex};
+        "></div>
+        '''
 
 @dataclass
 class NestedObjectElement(AttributeElement):

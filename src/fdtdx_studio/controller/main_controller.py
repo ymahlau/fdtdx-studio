@@ -117,7 +117,9 @@ class Controller:
       temporal_profile = fdtdx.SingleFrequencyProfile(**temporal_profile)
     
     keys = list(inspect.signature(self.model.create_mode_plane_source_obj).parameters.keys())
-    kwargs = {k: locals()[k] for k in keys if k in locals()}
+    # todo: Capture locals outside: Python 3 dict comprehensions have an isolated local scope.
+    local_snapshot = locals()
+    kwargs = {k: local_snapshot[k] for k in keys if k in local_snapshot}
     if 'name' in kwargs and project is None:
       kwargs['name'] = self.model.namecheck(kwargs['name']) #checks if the name is unique and changes it if not
     if project:

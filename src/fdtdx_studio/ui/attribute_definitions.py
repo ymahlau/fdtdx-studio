@@ -275,6 +275,62 @@ def extract_all_fdtdx_docstrings():
                 all_docs[cls_name].update(docs)
     return all_docs
 
+# Fallback tooltips for attributes that have no #: docstrings in the fdtdx source
+ATTRIBUTE_TOOLTIP_FALLBACKS: Dict[str, str] = {
+    'azimuth_angle': 'Azimuth angle of the source in degrees (rotation around vertical axis).',
+    'elevation_angle': 'Elevation angle of the source in degrees (tilt above/below horizontal).',
+    'static_amplitude_factor': 'Scalar amplitude multiplier applied to the source field.',
+    'max_angle_random_offset': 'Maximum random angular offset added to azimuth/elevation (degrees).',
+    'max_horizontal_offset': 'Maximum random horizontal position offset (physical units).',
+    'max_vertical_offset': 'Maximum random vertical position offset (physical units).',
+    'normalize_by_energy': 'If True, normalizes the source field so total energy is 1.',
+    'fixed_E_polarization_vector': 'Fixed electric field polarization direction (x, y, z). If None, auto-computed.',
+    'fixed_H_polarization_vector': 'Fixed magnetic field polarization direction (x, y, z). If None, auto-computed.',
+    'radius': 'Radius of the Gaussian beam in physical units.',
+    'std': 'Standard deviation of the Gaussian beam profile, relative to the radius.',
+    'amplitude': 'Scalar amplitude of the source.',
+    'mode_index': 'Index of the eigenmode to use (0 = fundamental mode).',
+    'filter_pol': 'Polarization filter applied to the mode (te, tm, or None).',
+    'partial_real_position': 'Position of the object in physical space (x, y, z).',
+    'partial_real_shape': 'Size/shape of the object in physical space (x, y, z).',
+    'color': 'Display color of the object in the 3D viewport.',
+    'dtype': 'Numerical precision for recorded data (float32 or float64).',
+    'exact_interpolation': 'If True, uses exact interpolation for detector data. Slower but more accurate.',
+    'inverse': 'If True, runs detector in inverse/adjoint mode.',
+    'if_inverse_plot_backwards': 'If True, reverses time axis when plotting inverse data.',
+    'num_video_workers': 'Number of parallel workers for video export (0 = auto).',
+    'plot_interpolation': 'Interpolation method used in 2D detector plots (e.g. "gaussian").',
+    'plot_dpi': 'Resolution of exported detector plots in dots per inch.',
+    'plot': 'If True, generates plots for this detector automatically.',
+    'reduce_volume': 'If True, reduces the detector volume to save memory.',
+    'components': 'Field components to record (e.g. Ex, Ey, Ez, Hx, Hy, Hz).',
+    'num_time_steps_recorded': 'Number of time steps to record. None means all steps.',
+    'as_slices': 'If True, stores detector data as 2D slices instead of a full volume.',
+    'x_slice': 'X-coordinate of the slice plane (physical units).',
+    'y_slice': 'Y-coordinate of the slice plane (physical units).',
+    'z_slice': 'Z-coordinate of the slice plane (physical units).',
+    'fixed_propagation_axis': 'Fixed axis index for the propagation direction (0=x, 1=y, 2=z).',
+    'keep_all_components': 'If True, keeps all field components instead of just flux.',
+    'direction': "Direction of propagation ('+' or '-' along the propagation axis).",
+    'name': 'Unique name for this object.',
+    'material': 'Material assigned to this object.',
+    'start_time': 'Absolute time at which the source/detector turns on (seconds).',
+    'start_after_periods': 'Number of wave periods to wait before turning on.',
+    'end_time': 'Absolute time at which the source/detector turns off (seconds).',
+    'end_after_periods': 'Number of wave periods after which the source/detector turns off.',
+    'on_for_time': 'Duration for which the source/detector stays on (seconds).',
+    'on_for_periods': 'Duration in wave periods for which the source/detector stays on.',
+    'period': 'Repetition period of the on/off switching cycle (seconds).',
+    'interval': 'Time step interval between consecutive on-events.',
+    'is_always_off': 'If True, the source/detector is permanently disabled.',
+    'phase_shift': 'Phase offset of the wave in radians.',
+    'wavelength': 'Wavelength of the wave in physical units.',
+    'frequency': 'Frequency of the wave in Hz.',
+    'center_frequency': 'Center frequency of the Gaussian pulse in Hz.',
+    'spectral_width': 'Spectral width (bandwidth) of the Gaussian pulse in Hz.',
+    'num_startup_periods': 'Number of ramp-up periods before the source reaches full amplitude.',
+}
+
 def populate_tooltips():
     try:
         all_docs = extract_all_fdtdx_docstrings()
@@ -297,6 +353,11 @@ def populate_tooltips():
             for attr_def in defs:
                 if not attr_def.tooltip and attr_def.name in attr_fallback:
                     attr_def.tooltip = attr_fallback[attr_def.name]
+            
+            # Third pass: use the static fallback dictionary
+            for attr_def in defs:
+                if not attr_def.tooltip and attr_def.name in ATTRIBUTE_TOOLTIP_FALLBACKS:
+                    attr_def.tooltip = ATTRIBUTE_TOOLTIP_FALLBACKS[attr_def.name]
                         
     except Exception as e:
         print(f"Warning: Failed to parse dynamic tooltips: {e}")

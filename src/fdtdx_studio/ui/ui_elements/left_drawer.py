@@ -3,7 +3,6 @@ from fdtdx_studio.ui.popups.pop_up_new_object import pop_up_new_object
 from fdtdx_studio.ui.popups.pop_up_new_source import pop_up_new_source
 import fdtdx
 from fdtdx_studio.ui.popups.detector_popup import DetectorPopup
-from fdtdx_studio.ui.panels.volume_panel import volume_panel
 from fdtdx_studio.ui.popups.pop_up_new_material import pop_up_new_material
 
 class LeftDrawer:
@@ -18,7 +17,6 @@ class LeftDrawer:
         self.view = view
         # LeftDrawer manages its own popup + scrollarea
         self.detector_popup = DetectorPopup(controller)
-        self.Volume_Panel = volume_panel(controller)
         self.scrollarea_sim_objects = None
         self.scrollarea_source_objects = None
         self.scrollarea_sim_detector = None
@@ -28,15 +26,6 @@ class LeftDrawer:
     def build(self):
         """Builds the left drawer UI components."""
         with ui.left_drawer(elevated=True).style('background-color: #E3E3E3').classes('justify-start') as self.left_drawer:    
-          # Expansion for Simulation Objects
-          with ui.expansion().props('open').classes('w-full') as self.sim_obj_exp:
-            with self.sim_obj_exp.add_slot('header'):
-              with ui.row().classes('w-full items-center justify-between'):
-                ui.label('Simulation Volume').style('font-size: 15px')
-            with ui.scroll_area().classes('w-full h-48 ml-4') as self.scrollarea_sim_volume:
-              ui.button("Simulation Volume", on_click= lambda: self.Volume_Panel.Volume_panel())
-              
-
           with ui.expansion().props('open').classes('w-full') as self.sim_obj_exp:
             with self.sim_obj_exp.add_slot('header'):
               with ui.row().classes('w-full items-center justify-between'):

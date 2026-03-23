@@ -331,9 +331,13 @@ ATTRIBUTE_TOOLTIP_FALLBACKS: Dict[str, str] = {
     'num_startup_periods': 'Number of ramp-up periods before the source reaches full amplitude.',
 }
 
+ALL_DOCS: Dict[str, Dict[str, str]] = {}
+
 def populate_tooltips():
+    global ALL_DOCS
     try:
         all_docs = extract_all_fdtdx_docstrings()
+        ALL_DOCS.update(all_docs)
         
         # Build a flat attribute-name -> docstring fallback map across all classes
         attr_fallback: Dict[str, str] = {}

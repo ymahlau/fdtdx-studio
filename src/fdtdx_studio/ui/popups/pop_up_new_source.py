@@ -153,12 +153,8 @@ class pop_up_new_source(NewPopUp):
               value='SingleFrequencyProfile',
           )
 
-          with ui.row().classes('w-full items-center gap-1'):
-            self.temp_profile_value1 = ui.number('Phase Shift').classes('flex-1').props('dense')
-            add_tooltip_icon(_tip('phase_shift'))
-          with ui.row().classes('w-full items-center gap-1'):
-            self.temp_profile_value2 = ui.number('Num of Startup Periods').classes('flex-1').props('dense')
-            add_tooltip_icon(_tip('num_startup_periods'))
+          self._temp_profile_container = ui.column().classes('w-full gap-1')
+          self._build_temp_profile_fields()
 
           ui.label('Angles').style('font-size: 14px; padding-bottom: 0px; font-weight: bold; margin-top: 12px;')
           with ui.row().classes('w-full items-center gap-1'):
@@ -216,20 +212,31 @@ class pop_up_new_source(NewPopUp):
 
       self.add_button(self.button_function, self.button_label)
 
+  def _build_temp_profile_fields(self):
+    """(Re)build the temporal profile value fields with matching tooltips."""
+    self._temp_profile_container.clear()
+    with self._temp_profile_container:
+      if self.temporal_profile_type == 'GaussianPulseProfile':
+        lbl1, key1 = 'Center Frequency', 'center_frequency'
+        lbl2, key2 = 'Spectral Width', 'spectral_width'
+      else:
+        lbl1, key1 = 'Phase Shift', 'phase_shift'
+        lbl2, key2 = 'Num of Startup Periods', 'num_startup_periods'
+      with ui.row().classes('w-full items-center gap-1'):
+        self.temp_profile_value1 = ui.number(lbl1).classes('flex-1').props('dense')
+        add_tooltip_icon(_tip(key1))
+      with ui.row().classes('w-full items-center gap-1'):
+        self.temp_profile_value2 = ui.number(lbl2).classes('flex-1').props('dense')
+        add_tooltip_icon(_tip(key2))
+
   def set_temp_profile_type(self, temporal_profile_type=None):
-    """Sets the temporal profile type and changes the labels of the values accordingly."""
+    """Sets the temporal profile type and rebuilds the value fields with correct tooltips."""
     if temporal_profile_type:
       self.temporal_profile_type = temporal_profile_type
       self.temporal_profile_button.value = temporal_profile_type
     else:
       self.temporal_profile_type = self.temporal_profile_button.value
-
-    if self.temporal_profile_type == 'SingleFrequencyProfile':
-      self.temp_profile_value1.label = 'Phase Shift'
-      self.temp_profile_value2.label = 'Num of Startup Periods'
-    elif self.temporal_profile_type == 'GaussianPulseProfile':
-      self.temp_profile_value1.label = 'Center Frequency'
-      self.temp_profile_value2.label = 'Spectral Width'
+    self._build_temp_profile_fields()
 
   @ui.refreshable
   def make_source_mode_options(self):
@@ -250,7 +257,7 @@ class pop_up_new_source(NewPopUp):
         with ui.row().classes('w-full items-center gap-1'):
           self.std = ui.number('Standard Deviation', value=(1/3), min=0.0, step=0.1)
           add_tooltip_icon(_tip('std'))
-      ui.checkbox('Normalize by Energy', on_change=lambda s: setattr(self, 'normalize_by_energy', s.value))
+      ui.checkbox('Normalize by Energy', value=self.normalize_by_energy, on_change=lambda s: setattr(self, 'normalize_by_energy', s.value))
       with ui.column():
         ui.label('Fixed E Polarization Vector').style('font-size: 14px; font-weight: bold; margin-top: 8px; margin-bottom: 8px')
         self.fixed_E_x = ui.number('x', value=1)

@@ -29,8 +29,8 @@ def _build_sim_tooltips():
                     if key in docs:
                         tips[key] = docs[key]
                         break
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"Warning: Failed to extract SimulationConfig tooltips dynamically: {e}")
     return tips
 
 _SIM_TOOLTIPS = _build_sim_tooltips()

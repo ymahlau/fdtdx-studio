@@ -11,6 +11,7 @@ export default {
         this.$nextTick(() => {
             const canvas = this.$refs.canvas;
             this.renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setSize(120, 120);
             this.renderer.setClearColor(0x000000, 0);
 

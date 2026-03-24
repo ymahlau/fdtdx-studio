@@ -22,6 +22,14 @@ class AttributeElement:
         if self.element:
             self.element.value = value
 
+    def _add_info_icon(self):
+        """Adds a small ⓘ info icon that shows the tooltip on hover."""
+        if self.tooltip:
+            ui.icon('info_outline').classes(
+                'text-grey-5 cursor-help'
+            ).style('font-size: 14px; margin-left: 2px;').tooltip(self.tooltip)
+
+
 @dataclass
 class NumberElement(AttributeElement):
     """UI element for float/int values."""
@@ -29,30 +37,38 @@ class NumberElement(AttributeElement):
     format: str = '%.2f'
 
     def render(self):
-        self.element = ui.number(self.label, value=self.value, step=self.step, format=self.format, on_change=lambda e: self.on_change(e.value))
-        self.element.classes('w-full').props('dense')
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        with ui.row().classes('w-full items-center gap-1') as container:
+            self.element = ui.number(
+                self.label, value=self.value, step=self.step,
+                format=self.format, on_change=lambda e: self.on_change(e.value)
+            ).classes('flex-1').props('dense')
+            self._add_info_icon()
+        return container
+
 
 @dataclass
 class StringElement(AttributeElement):
     """UI element for string values."""
     def render(self):
-        self.element = ui.input(self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
-        self.element.classes('w-full').props('dense')
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        with ui.row().classes('w-full items-center gap-1') as container:
+            self.element = ui.input(
+                self.label, value=self.value, on_change=lambda e: self.on_change(e.value)
+            ).classes('flex-1').props('dense')
+            self._add_info_icon()
+        return container
+
 
 @dataclass
 class BooleanElement(AttributeElement):
     """UI element for boolean values."""
     def render(self):
-        self.element = ui.checkbox(self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        with ui.row().classes('w-full items-center gap-1') as container:
+            self.element = ui.checkbox(
+                self.label, value=self.value, on_change=lambda e: self.on_change(e.value)
+            )
+            self._add_info_icon()
+        return container
+
 
 @dataclass
 class SelectElement(AttributeElement):
@@ -64,11 +80,14 @@ class SelectElement(AttributeElement):
         self.options = options
 
     def render(self):
-        self.element = ui.select(self.options, label=self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
-        self.element.classes('w-full')
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        with ui.row().classes('w-full items-center gap-1') as container:
+            self.element = ui.select(
+                self.options, label=self.label, value=self.value,
+                on_change=lambda e: self.on_change(e.value)
+            ).classes('flex-1')
+            self._add_info_icon()
+        return container
+
 
 @dataclass
 class MultiSelectElement(AttributeElement):
@@ -85,11 +104,14 @@ class MultiSelectElement(AttributeElement):
             self.value = []
 
     def render(self):
-        self.element = ui.select(self.options, label=self.label, value=self.value, multiple=True, on_change=lambda e: self.on_change(e.value))
-        self.element.classes('w-full')
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        with ui.row().classes('w-full items-center gap-1') as container:
+            self.element = ui.select(
+                self.options, label=self.label, value=self.value,
+                multiple=True, on_change=lambda e: self.on_change(e.value)
+            ).classes('flex-1')
+            self._add_info_icon()
+        return container
+
 
 @dataclass
 class ColorElement(AttributeElement):
@@ -115,8 +137,10 @@ class ColorElement(AttributeElement):
         normalized = self._normalize_hex(self.value)
 
         with ui.column().classes('w-full gap-1') as self.element:
-            if self.label:
-                ui.label(self.label)
+            with ui.row().classes('items-center gap-1'):
+                if self.label:
+                    ui.label(self.label)
+                self._add_info_icon()
 
             with ui.row().classes('w-full items-end gap-2 no-wrap'):
                 # preset color selection
@@ -138,9 +162,6 @@ class ColorElement(AttributeElement):
                 self.color_preview = ui.html(
                     self._preview_html(normalized)
                 ).classes('shrink-0')
-
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
 
         self.value = normalized if normalized is not None else self.value
         return self.element
@@ -266,13 +287,13 @@ class NestedObjectElement(AttributeElement):
     on_navigate: Callable[[], None] = None
     
     def render(self):
-        with ui.row().classes('w-full items-center justify-between'):
-            ui.label(self.label)
+        with ui.row().classes('w-full items-center justify-between') as container:
+            with ui.row().classes('items-center gap-1'):
+                ui.label(self.label)
+                self._add_info_icon()
             self.element = ui.button(icon='arrow_forward', on_click=self.on_navigate).props('flat round dense')
-        
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
-        return self.element
+        return container
+
 
 @dataclass
 class Vector3Element(AttributeElement):
@@ -283,14 +304,14 @@ class Vector3Element(AttributeElement):
 
     def render(self):
         with ui.column().classes('w-full') as self.element:
-            ui.label(self.label).classes('text-sm font-bold')
+            with ui.row().classes('items-center gap-1'):
+                ui.label(self.label).classes('text-sm font-bold')
+                self._add_info_icon()
             with ui.row().classes('w-full flex-nowrap gap-1'):
                 self.x = ui.number('x', value=self.value[0], on_change=lambda e: self._on_component_change(0, e.value)).classes('flex-1').props('dense')
                 self.y = ui.number('y', value=self.value[1], on_change=lambda e: self._on_component_change(1, e.value)).classes('flex-1').props('dense')
                 self.z = ui.number('z', value=self.value[2], on_change=lambda e: self._on_component_change(2, e.value)).classes('flex-1').props('dense')
         
-        if self.tooltip:
-            self.element.tooltip(self.tooltip)
         return self.element
 
     def _on_component_change(self, index, val):

@@ -1,5 +1,36 @@
 from nicegui import ui
 import fdtdx
+from fdtdx_studio.ui.attribute_definitions import ATTRIBUTE_TOOLTIP_FALLBACKS
+
+
+def _tip(key: str) -> str:
+    """Return tooltip text for a given attribute key, or ''."""
+    return ATTRIBUTE_TOOLTIP_FALLBACKS.get(key, '')
+
+
+def add_tooltip_icon(tooltip_text: str):
+    """Render a small ⓘ icon with a tooltip. Call inside the current NiceGUI context."""
+    if tooltip_text:
+        ui.icon('info_outline').classes('text-grey-5 cursor-help').style(
+            'font-size: 14px; margin-left: 2px;'
+        ).tooltip(tooltip_text)
+
+
+def labeled_number(label: str, tooltip_key: str, **kwargs) -> ui.number:
+    """Render a ui.number with an inline ⓘ icon and return the number widget."""
+    with ui.row().classes('w-full items-center gap-1'):
+        elem = ui.number(label, **kwargs)
+        add_tooltip_icon(_tip(tooltip_key))
+    return elem
+
+
+def labeled_input(label: str, tooltip_key: str, **kwargs) -> ui.input:
+    """Render a ui.input with an inline ⓘ icon and return the input widget."""
+    with ui.row().classes('w-full items-center gap-1'):
+        elem = ui.input(label, **kwargs)
+        add_tooltip_icon(_tip(tooltip_key))
+    return elem
+
 
 class new_pop_up():
   """Superclass for creating new pop-up dialogs for adding simulation components."""
@@ -33,7 +64,9 @@ class new_pop_up():
     """Builds the common UI components for the superclass popup."""
 
     self.input_color = '#FF0000'
-    self.input_name = ui.input('Name', value='New Object',on_change= lambda e: self.validate_name(e.value))
+    with ui.row().classes('w-full items-center gap-1'):
+        self.input_name = ui.input('Name', value='New Object', on_change=lambda e: self.validate_name(e.value))
+        add_tooltip_icon(_tip('name'))
     self.name_error = ui.label().style('color: red; font-size: 13px')
     self.name_error.set_visibility(False)
     with ui.row().classes('w-full items-end gap-2 no-wrap'):
@@ -66,9 +99,9 @@ class new_pop_up():
       ).classes('shrink-0')
     # Dimension inputs
     ui.label('Unit in m')
-    self.input_width = ui.number('x', value=0.000003, step = 0.000001)
-    self.input_length = ui.number('y', value=0.000003, step = 0.000001)
-    self.input_height = ui.number('z', value=0.000003, step = 0.000001)
+    self.input_width = labeled_number('x', 'partial_real_shape', value=0.000003, step=0.000001)
+    self.input_length = labeled_number('y', 'partial_real_shape', value=0.000003, step=0.000001)
+    self.input_height = labeled_number('z', 'partial_real_shape', value=0.000003, step=0.000001)
 
   def on_color_input_change(self, color: str) -> None:
     self.input_color = color
@@ -116,14 +149,13 @@ class new_pop_up():
 
   def add_button(self, function, label='Save'):
     """Adds a button to the popup with the given function and label."""
-    # Callback verzögert ausführen und aktuelle Werte verwenden
     self.save = ui.button('Save',
-      on_click=  function
-    ).classes('w-full').style('margin-top: 8px;').on_click(lambda: self.controller.ui_update()) 
+      on_click=function
+    ).classes('w-full').style('margin-top: 8px;').on_click(lambda: self.controller.ui_update())
 
-  def validate_name(self, name:str):
+  def validate_name(self, name: str):
     '''Validates the name to guarantee name is not already in use'''
-    if hasattr(self,'save'):
+    if hasattr(self, 'save'):
       if self.controller.model.name_is_object_X(name):
         self.name_error.set_text("Objects cannot be named Object_X")
         self.name_error.set_visibility(True)
@@ -147,7 +179,7 @@ class new_pop_up():
     self.input_material = material
 
   def open_new_popup(self):
-    self.new_pop_up.open()  
+    self.new_pop_up.open()
 
   def close_self(self):
         self.input_color = '#FF0000'

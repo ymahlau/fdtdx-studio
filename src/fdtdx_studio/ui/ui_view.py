@@ -49,6 +49,7 @@ class View:
     self.detector_panel = DetectorConfigurationPanel(self, controller)
 
     #open first Project config Dialog
+    assert self.dialog_controller is not None
     self.dialog_controller.Config_Dialog(True)
     
   def open_Project(self, Project: Project, controller):
@@ -78,12 +79,12 @@ class View:
       with ui.row().classes('items-center justify-end').style('margin-right: 4px;'):
         ui.button(icon= 'help', color = None).props('flat').style('padding: 0px; color:#F3E155;').on_click(lambda: ui.navigate.to('https://fdtdx.readthedocs.io/en/latest/', new_tab= True)) 
         ui.separator().props('vertical').style('background-color: #DDA091; width: 2px; height: 28px; padding: 0px; margin: 0px 8px; align-self: center;')
-        ui.button(on_click=lambda: self.dialog_controller.new_scene_controller(), icon= 'add_box', color= None).props('flat').style('padding: 0px; color: #CF78B4;').tooltip('New Project')
-        ui.button(on_click=lambda: self.dialog_controller.choose_Project(), icon = 'file_upload', color = None).props('flat').style('padding: 0px; color: #BE44E4;').tooltip('Import')
+        ui.button(on_click=lambda: self.dialog_controller.new_scene_controller() if self.dialog_controller else None, icon= 'add_box', color= None).props('flat').style('padding: 0px; color: #CF78B4;').tooltip('New Project')
+        ui.button(on_click=lambda: self.dialog_controller.choose_Project() if self.dialog_controller else None, icon = 'file_upload', color = None).props('flat').style('padding: 0px; color: #BE44E4;').tooltip('Import')
         with ui.button(icon='file_download', color = None).props('flat').style('padding: 0px; margin-right: 16px; color: #BE44E4;').tooltip('Export'):
           with ui.menu() as menu:
-            ui.menu_item('Save Project', lambda: self.project.save_Project(), auto_close= False)
-            ui.menu_item('Save Project as', lambda: self.project.save_Project_as(), auto_close= False)
+            ui.menu_item('Save Project', lambda: self.project.save_Project() if self.project else None, auto_close= False)
+            ui.menu_item('Save Project as', lambda: self.project.save_Project_as() if self.project else None, auto_close= False)
             ui.menu_item('Close', on_click= menu.close)
   
   def send_error(self, message, timeout=10000):

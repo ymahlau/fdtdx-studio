@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 from nicegui import ui
 from fdtdx_studio.ui.popups.new_pop_up import new_pop_up as NewPopUp, add_tooltip_icon, labeled_number, _tip
 
@@ -60,6 +62,17 @@ class pop_up_new_source(NewPopUp):
 
   def _call_add(self):
     """Dispatch add call to controller based on selected source kind."""
+    assert self.input_name and self.input_length and self.input_width and self.input_height
+    assert self.wave_value and self.input_phase_shift and self.azimuth_angle and self.elevation_angle
+    assert self.temp_profile_value1 and self.temp_profile_value2
+    assert self.switch_start_time and self.switch_start_after_periods
+    assert self.switch_end_time and self.switch_end_after_periods
+    assert self.switch_on_for_time and self.switch_on_for_periods
+    assert self.switch_period and self.switch_interval
+    assert self.popup_new_source
+    assert self.mode_index and self.radius and self.std
+    assert self.fixed_E_x and self.fixed_E_y and self.fixed_E_z
+    assert self.fixed_H_x and self.fixed_H_y and self.fixed_H_z
     kwargs = dict(
       popup=self.popup_new_source,
       typ='scrollarea_sim_sources',
@@ -135,6 +148,7 @@ class pop_up_new_source(NewPopUp):
       with ui.row():
         with ui.column():
           self.build_common_ui()
+          assert self.input_name and self.input_width and self.input_length and self.input_height
           self.input_name.set_value("New Source")
           self.input_width.set_value(10e-6)
           self.input_length.set_value(10e-6)
@@ -208,7 +222,7 @@ class pop_up_new_source(NewPopUp):
           self.switch_fixed_on_time_steps = ui.input('Fixed On Time Steps', placeholder='e.g., 100,250,500')
           ui.checkbox('Switch Is Always Off', on_change=lambda s: setattr(self, 'switch_is_always_off', s.value))
 
-        self.make_source_mode_options()
+        cast(Any, self.make_source_mode_options)()
 
       self.add_button(self.button_function, self.button_label)
 
@@ -270,10 +284,13 @@ class pop_up_new_source(NewPopUp):
         self.fixed_H_z = ui.number('z', value=None)
 
   def open_new_source_popup(self):
+    assert self.popup_new_source
     self.popup_new_source.open()
 
   def set_wave(self, wave):
     """Sets the Wave Type and updates the button display."""
+    assert self.wave_value
+    assert self.wave_button
     self.wave_value.label = f'{wave} Value'
     self.wave_button.close()
     self.wave = wave
@@ -281,12 +298,14 @@ class pop_up_new_source(NewPopUp):
 
   def set_direction(self, direction):
     """Sets the direction and updates the button display."""
+    assert self.direction_button
     self.direction_button.close()
     self.input_direction = direction
     self.direction_button.text = f'Direction: {direction}'
 
   def set_filter(self, filter):
     """Sets the filter_pol and updates the button display."""
+    assert self.filter_pol_button
     self.filter_pol_button.close()
     self.filter_pol = filter
     self.filter_pol_button.text = f'Filter pol: {filter}'

@@ -284,7 +284,7 @@ class ColorElement(AttributeElement):
 @dataclass
 class NestedObjectElement(AttributeElement):
     """UI element for navigating to a nested object's configuration."""
-    on_navigate: Callable[[], None] = None
+    on_navigate: Callable[[], None] | None = None
     
     def render(self):
         with ui.row().classes('w-full items-center justify-between') as container:

@@ -188,6 +188,9 @@ class new_pop_up():
         if self.color_select:
             self.color_select.set_value('Red')
         self.update_color_preview()
+        assert self.input_length is not None
+        assert self.input_width is not None
+        assert self.input_height is not None
         self.input_length.value = 1
         self.input_width.value = 1
         self.input_height.value = 1

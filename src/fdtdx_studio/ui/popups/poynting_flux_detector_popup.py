@@ -29,6 +29,9 @@ class PoyntingFluxDetectorPopup(BaseDetectorPopup):
         self.input_keep_all = ui.checkbox('Keep All Components', value=False)
 
     def collect_detector_kwargs(self) -> dict:
+        assert self.input_direction is not None
+        assert self.input_axis is not None
+        assert self.input_keep_all is not None
         return {
             'direction': self.input_direction.value,
             'fixed_propagation_axis': self.input_axis.value,

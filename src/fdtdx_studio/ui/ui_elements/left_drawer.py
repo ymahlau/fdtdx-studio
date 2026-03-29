@@ -5,6 +5,7 @@ import fdtdx
 from fdtdx_studio.ui.popups.detector_popup import DetectorPopup
 from fdtdx_studio.ui.panels.volume_panel import volume_panel
 from fdtdx_studio.ui.popups.pop_up_new_material import pop_up_new_material
+from fdtdx.objects.static_material.static import UniformMaterialObject, SimulationVolume
 
 class LeftDrawer:
     """Creates the left drawer UI visible on the main view, used for creating and managing simulation components.
@@ -86,6 +87,9 @@ class LeftDrawer:
     
     def clear_drawer(self):
       '''clears all scrollareas in left drawer'''
+      assert self.scrollarea_sim_detector is not None
+      assert self.scrollarea_sim_objects is not None
+      assert self.scrollarea_source_objects is not None
       self.scrollarea_sim_detector.clear()
       self.scrollarea_sim_objects.clear()
       self.scrollarea_source_objects.clear()
@@ -106,6 +110,7 @@ class LeftDrawer:
         case "PerfectlyMatchedLayer":
           container = None
           if object[0] != None:
+            assert self.pml_thickness is not None
             self.pml_thickness.value = object[0]
         case _:
           container = None
@@ -147,7 +152,7 @@ class LeftDrawer:
       IsUsed = False
       usedIn = []
       for obj in self.controller.project.objects:
-        if type(obj) == fdtdx.objects.static_material.static.UniformMaterialObject or type(obj) == fdtdx.objects.static_material.static.SimulationVolume:
+        if type(obj) == UniformMaterialObject or type(obj) == SimulationVolume:
           if self.controller.model.material.get_name_from_material(obj.material) == material[0]:
             IsUsed = True
             usedIn.append(obj)

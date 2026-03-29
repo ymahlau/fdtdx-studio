@@ -1,4 +1,5 @@
 from nicegui import ui
+from typing import cast
 import fdtdx
 tooltip_explanation = {}
 
@@ -65,11 +66,12 @@ class Pop_up_constraints():
     for key, value in self.con_value.items():
       if value is not None:
         if any(item in key for item in coor):
-          result[key[:-2]] = (value,) if not key[:-2] in result.keys() else result[key[:-2]] + (value,)
+          result[key[:-2]] = (value,) if not key[:-2] in result.keys() else cast(tuple, result[key[:-2]]) + (value,)
         else:
           result[key] = value
     if result['type'] != 'SizeExtensionConstraint':
-      result.update({'axes': tuple(i for i in range(len(result['axes'])) if result['axes'][i])})
+      axes_list = cast(list | tuple, result['axes'])
+      result.update({'axes': tuple(i for i in range(len(axes_list)) if axes_list[i])})
     return result
 
 
@@ -123,6 +125,7 @@ class Pop_up_constraints():
     with ui.row():
       ui.button('Save Changes', on_click=self.close_pop_up)
       if self.canback:
+        assert self.stepper is not None
         ui.button(text='Back', on_click=self.stepper.previous).props('flat')
       else:
         ui.button(text='Cancel', on_click=self.close_pop_up)
@@ -158,6 +161,7 @@ class Pop_up_constraints():
     with ui.row():
       ui.button('Save Changes', on_click=self.close_pop_up)
       if self.canback:
+        assert self.stepper is not None
         ui.button(text='Back', on_click=self.stepper.previous).props('flat')
       else:
          ui.button(text='Cancel', on_click=self.close_pop_up)
@@ -209,6 +213,7 @@ class Pop_up_constraints():
     with ui.row():
       ui.button('Save Changes', on_click=self.close_pop_up)
       if self.canback:
+        assert self.stepper is not None
         ui.button(text='Back', on_click=self.stepper.previous).props('flat')
       else:
          ui.button(text='Cancel', on_click=self.close_pop_up)
@@ -238,6 +243,7 @@ class Pop_up_constraints():
     with ui.row():
       ui.button('Save Changes', on_click=self.close_pop_up)
       if self.canback:
+        assert self.stepper is not None
         ui.button(text='Back', on_click=self.stepper.previous).props('flat')
       else:
          ui.button(text='Cancel', on_click=self.close_pop_up)
@@ -269,4 +275,5 @@ class Pop_up_constraints():
         case 'GridCoordinateConstraint':
           self.build_grid_con()
     
+    assert self.stepper is not None
     self.stepper.next()

@@ -25,7 +25,7 @@ class volume_panel():
     self.material = Volume.material
 
 
-    with ui.dialog() as dialogVolume, ui.card():
+    with ui.card():
       ui.label("Simulation Volume").style('font-size: 18px; font-weight: bold;')
       
       with ui.row().classes('items-center gap-1'):

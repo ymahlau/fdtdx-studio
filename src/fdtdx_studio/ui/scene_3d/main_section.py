@@ -19,7 +19,7 @@ class MainSection:
     self.objects = {}
     self.colors = {}
     self.controller = controller
-    self.camera_distance_base = (10, 0, 10)
+    self.camera_distance_base = (-20, 0, 0)
     self.unit_scale = 1000000 # 1 unit = 1 micrometer
 
     with ui.element().classes('w-full h-[90vh] flex flex-col top-0'):
@@ -100,7 +100,10 @@ class MainSection:
     with self.scene:
       box = ui.scene.box(1,1, 1, wireframe=True).material('#888888')
     box.scale(*volume_units)
-    self.camera_distance_base = (volume_units[0]*1.2, 0, 0) # adjust camera distance based on volume size
+    # Adjust camera distance based on max volume size: positioned on negative X looking at origin
+    # This keeps X pointing back (into the scene) and Z pointing up. (Y will point Left due to right-handed coordinates)
+    max_dim = max(volume_units) if volume_units else 1.0
+    self.camera_distance_base = (-max_dim * 1.5, 0, 0)
     self.center_view()
     self.objects['Simulation_Volume'] = box
   

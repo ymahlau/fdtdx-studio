@@ -44,6 +44,7 @@ class RightDrawer:
         self.config_panel.clear()
         await ui.context.client.connected() #Ensures Ui is ready
         with self.config_panel:
+          self.simparpanel.button = None
           self.simparpanel.simulation_param_panel()
 
     async def update_vol_drawer(self):

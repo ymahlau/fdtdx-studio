@@ -44,14 +44,20 @@ class volume_panel():
       z.value = L
       
     def preset_changed(val):
-      if val == 'Small': preset(5e-6, 5e-6, 5e-6)
-      elif val == 'Medium': preset(1e-5, 1e-5, 1e-5)
-      elif val == 'Large': preset(1e-4, 1e-4, 1e-4)
+      if val == 'Small':
+          preset(5e-6, 5e-6, 5e-6)
+      elif val == 'Medium':
+          preset(1e-5, 1e-5, 1e-5)
+      elif val == 'Large':
+          preset(1e-4, 1e-4, 1e-4)
 
     def get_preset_name(vt):
-        if all(math.isclose(v, 5e-6, rel_tol=1e-5) for v in vt): return 'Small'
-        if all(math.isclose(v, 1e-5, rel_tol=1e-5) for v in vt): return 'Medium'
-        if all(math.isclose(v, 1e-4, rel_tol=1e-5) for v in vt): return 'Large'
+        if all(math.isclose(v, 5e-6, rel_tol=1e-5) for v in vt):
+            return 'Small'
+        if all(math.isclose(v, 1e-5, rel_tol=1e-5) for v in vt):
+            return 'Medium'
+        if all(math.isclose(v, 1e-4, rel_tol=1e-5) for v in vt):
+            return 'Large'
         return None
 
     current_preset = get_preset_name(VTuple)

@@ -1,3 +1,4 @@
+from typing import Any, cast
 from nicegui import ui
 from fdtdx_studio.ui.popups.new_pop_up import new_pop_up as NewPopUp
 
@@ -186,7 +187,7 @@ class BaseDetectorPopup(NewPopUp):
         assert self.input_height is not None
         assert self.input_name is not None
 
-        self.color_show.text = 'Color: Red'
+        cast(Any, self.color_show).text = 'Color: Red'
         self.input_color = 'Red'
         self.input_length.value = 1
         self.input_width.value = 1

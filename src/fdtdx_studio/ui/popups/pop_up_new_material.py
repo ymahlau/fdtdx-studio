@@ -1,10 +1,12 @@
+from typing import Any, cast
+
 from fdtdx_studio.ui.popups.new_pop_up import new_pop_up as NewPopUp
 from nicegui import ui
 
 class pop_up_new_material(NewPopUp):
   def __init__(self, controller):
     super().__init__(controller)
-         
+    self.kind_button: Any = None     
     self.pop_up_new_material= None
     self.input_kind = "Scalar"
     self.build_dialog()
@@ -18,7 +20,7 @@ class pop_up_new_material(NewPopUp):
       #  ui.item('Scalar', on_click=lambda: self.set_kind('Scalar'))
       #  ui.item('XYZ Values', on_click=lambda: self.set_kind('XYZ Values'))
  
-      self.make_source_mode_options()
+      cast(Any, self.make_source_mode_options)()
 
   def set_kind(self, kind):
     self.input_kind = kind
@@ -28,10 +30,12 @@ class pop_up_new_material(NewPopUp):
     self.make_source_mode_options.refresh()
 
   def open_new_material_popup(self):
+      assert self.pop_up_new_material is not None
       self.pop_up_new_material.open()
 
   def add_material(self, Permittivity, Permeability, Electrical_conductivity, Magnetic_conductivity, name):
     '''adds material with given settings'''
+    assert self.pop_up_new_material is not None
     self.pop_up_new_material.close()
     self.pop_up_new_material.on('hide', lambda: (self.controller.add_material(Permittivity, Permeability, Electrical_conductivity, Magnetic_conductivity, name), ui.timer(0, lambda: self.controller.project.localmaterial_save(), once=True)))
     ui.notify('Material added successfully', position='bottom', color='green' )

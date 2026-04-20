@@ -59,6 +59,10 @@ class ModeOverlapDetectorPopup(BaseDetectorPopup):
         ).classes('w-full')
 
     def collect_detector_kwargs(self) -> dict:
+        assert self.input_direction is not None
+        assert self.input_axis is not None
+        assert self.input_filter_pol is not None
+        assert self.input_mode_index is not None
         return {
             'direction': self.input_direction.value,
             'fixed_propagation_axis': self.input_axis.value,
@@ -74,7 +78,9 @@ class ModeOverlapDetectorPopup(BaseDetectorPopup):
     #These are very ugly and can probably be polished into one at some point
     def set_wave(self, wave):
         """Sets the Wave Type and updates the button display."""
+        assert self.wave_value is not None
         self.wave_value.label = f'{wave} Value'
+        assert self.wave_button is not None
         self.wave_button.close()
         self.wave = wave
         self.wave_button.text = f'{wave}'

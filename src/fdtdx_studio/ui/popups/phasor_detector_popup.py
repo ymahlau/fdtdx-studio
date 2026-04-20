@@ -54,6 +54,11 @@ class PhasorDetectorPopup(BaseDetectorPopup):
         ).classes('w-full')
 
     def collect_detector_kwargs(self) -> dict:
+        assert self.input_direction is not None
+        assert self.input_axis is not None
+        assert self.input_wave_char is not None
+        assert self.input_components is not None
+        assert self.input_filter_pol is not None
         return {
             'direction': self.input_direction.value,
             'fixed_propagation_axis': self.input_axis.value,
@@ -65,6 +70,11 @@ class PhasorDetectorPopup(BaseDetectorPopup):
 
     def close_self(self):
         super().close_self()
+        assert self.input_direction is not None
+        assert self.input_axis is not None
+        assert self.input_wave_char is not None
+        assert self.input_components is not None
+        assert self.input_filter_pol is not None
         self.input_direction.value = None
         self.input_axis.value = None
         self.input_wave_char.value = 'standing'

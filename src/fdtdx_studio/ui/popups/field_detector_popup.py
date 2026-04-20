@@ -70,7 +70,7 @@ class FieldDetectorPopup(BaseDetectorPopup):
                     self.component_enabled[c] = not self.component_enabled[c]
                     sync_button(c)
 
-                btn = ui.button(comp, on_click=lambda c=comp: on_click(c))
+                btn = ui.button(comp, on_click=lambda e, c=comp: on_click(c))
                 self._component_buttons[comp] = btn
                 sync_button(comp)
 
@@ -92,6 +92,8 @@ class FieldDetectorPopup(BaseDetectorPopup):
         BaseDetectorPopup._call_add().
         """
         # >>> UI ONLY <<<
+        assert self.input_average is not None
+        assert self.input_normalize is not None
         return {
             'components': tuple(
                 c for c, enabled in self.component_enabled.items() if enabled
@@ -126,6 +128,7 @@ class FieldDetectorPopup(BaseDetectorPopup):
                 # explizit wieder blau setzen
                 btn.props('unelevated color=primary')
 
-
+        assert self.input_average is not None
+        assert self.input_normalize is not None
         self.input_average.value = False
         self.input_normalize.value = False

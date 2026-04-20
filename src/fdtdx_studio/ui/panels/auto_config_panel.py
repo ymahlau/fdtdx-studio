@@ -168,23 +168,42 @@ class AutoConfigPanel(ObjectConfigPanel):
     def _get_current_value(self, key, default):
         data = self.local_data
         for nav_key, _ in self.nav_stack:
-             data = data.get(nav_key, {})
-             if data is None: 
+            if isinstance(data, dict):
+                data = data.get(nav_key, {})
+            else:
+                data = getattr(data, nav_key, {})
+            if data is None: 
                 data = {}
-        return data.get(key, default)
+        
+        if isinstance(data, dict):
+            return data.get(key, default)
+        else:
+            return getattr(data, key, default)
 
     def _update_param(self, key, value):
-        # Update self.local_data
-        # We need to traverse down
         data = self.local_data
         path = [n[0] for n in self.nav_stack] # List of keys
         
         for nav_key in path:
-            if nav_key not in data or data[nav_key] is None:
-                data[nav_key] = {}
-            data = data[nav_key]
+            if isinstance(data, dict):
+                if nav_key not in data or data[nav_key] is None:
+                    data[nav_key] = {}
+                data = data[nav_key]
+            else:
+                if not hasattr(data, nav_key) or getattr(data, nav_key) is None:
+                    try:
+                        setattr(data, nav_key, {})
+                    except AttributeError:
+                        object.__setattr__(data, nav_key, {})
+                data = getattr(data, nav_key)
         
-        data[key] = value
+        if isinstance(data, dict):
+            data[key] = value
+        else:
+            try:
+                setattr(data, key, value)
+            except AttributeError:
+                object.__setattr__(data, key, value)
 
     def _navigate_to(self, key, target_cls):
         self.current_nested_path.append(key)

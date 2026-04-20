@@ -77,7 +77,6 @@ class pop_up_new_source(NewPopUp):
     assert self.switch_on_for_time and self.switch_on_for_periods
     assert self.switch_period and self.switch_interval
     assert self.popup_new_source
-
     kwargs = dict(
       popup=self.popup_new_source,
       typ='scrollarea_sim_sources',

@@ -144,7 +144,7 @@ class Model(Constraints):
             self.track_object_list.append(obj)
         return obj
     
-    def create_pml_boundary_obj(self, thickness=int):
+    def create_pml_boundary_obj(self, thickness:int | None = None):
         
         # Remove existing PML boundaries
         for obj in list(self.track_object_list):

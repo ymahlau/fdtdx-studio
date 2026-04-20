@@ -46,7 +46,7 @@ class Export:
 		cfg.append(self.build_config())
 		cfg.append(self.build_Volume(self.project.objects[0]))
 		for obj in self.project.objects[1:]:
-			match type(obj):
+			match obj:
 				case UniformMaterialObject():
 					cfg.append(self.build_Object(obj))
 				case ModePlaneSource():
@@ -82,8 +82,9 @@ class Export:
 		"""builds the JSON serializable output of all Nonstandard Materials that were defined, calls build material for each"""
 		cfg = []
 		for obj in list_obj:
-			if obj[2]:
-				cfg.append(self.build_material(obj))
+			name, material, editable = obj
+			if editable:
+				cfg.append(self.build_material(material))
 		return cfg
 
 	def build_config(self):
@@ -165,7 +166,7 @@ class Export:
 	def build_material(self, obj: fdtdx.Material):
 		return {
 			"__module__": "fdtdx.materials",
-			"__name__": obj,
+			"__name__": name,
 			"electric_conductivity": obj.electric_conductivity,
 			"magnetic_conductivity": obj.magnetic_conductivity,
 			"permeability": obj.permeability,
@@ -273,9 +274,8 @@ class Export:
 
 	# Builds JSON text for detectors with only the options expected for each type
 	def build_detector(self, obj):
-		types = type(obj)
 		result = {}
-		match types:
+		match obj:
 			case EnergyDetector():
 				result.update({"__module__": "fdtdx.objects.detectors.energy",
 												"__name__": "EnergyDetector",
@@ -344,7 +344,7 @@ class Export:
 													obj.max_random_real_offsets
 											}})
 		
-		if isinstance(types, ModeOverlapDetector):
+		if isinstance(obj, ModeOverlapDetector):
 			result.update({"mode_index": obj.mode_index})
 		
 		result.update({"name": obj.name,
@@ -365,13 +365,13 @@ class Export:
 											"__value__": obj.partial_real_position
 										}})
 		
-		if not isinstance(types, ModeOverlapDetector):
+		if not isinstance(obj, ModeOverlapDetector):
 			result.update({"plot": obj.plot})
 		
 		result.update({"plot_dpi": obj.plot_dpi,
 										"plot_interpolation": obj.plot_interpolation})
 		
-		if not isinstance(types, ModeOverlapDetector):
+		if not isinstance(obj, ModeOverlapDetector):
 			result.update({"reduce_volume": obj.reduce_volume})
 
 		result.update({
@@ -390,7 +390,7 @@ class Export:
 										"start_time": obj.switch.start_time
 									}})
 		
-		match types:
+		match obj:
 			case EnergyDetector():
 				result.update({"x_slice": obj.x_slice,
 											"y_slice": obj.y_slice,

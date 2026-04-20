@@ -67,6 +67,13 @@ class pop_up_new_source(NewPopUp):
 
   def _call_add(self):
     """Dispatch add call to controller based on selected source kind."""
+    if self.source_kind == 'MODE':
+        assert self.mode_index is not None
+    else:
+        assert self.radius and self.std
+        assert self.fixed_E_x and self.fixed_E_y and self.fixed_E_z
+        assert self.fixed_H_x and self.fixed_H_y and self.fixed_H_z
+
     kwargs = dict(
       popup=self.popup_new_source,
       typ='scrollarea_sim_sources',

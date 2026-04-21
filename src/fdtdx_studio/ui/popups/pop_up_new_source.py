@@ -63,11 +63,16 @@ class pop_up_new_source(NewPopUp):
   def _call_add(self):
     """Dispatch add call to controller based on selected source kind."""
     if self.source_kind == 'MODE':
-        assert self.mode_index is not None
+        assert self.mode_index is not None and self.mode_index.value is not None
     else:
-        assert self.radius and self.std
-        assert self.fixed_E_x and self.fixed_E_y and self.fixed_E_z
-        assert self.fixed_H_x and self.fixed_H_y and self.fixed_H_z
+        assert self.radius is not None and self.radius.value is not None
+        assert self.std is not None and self.std.value is not None
+        assert self.fixed_E_x is not None and self.fixed_E_x.value is not None
+        assert self.fixed_E_y is not None and self.fixed_E_y.value is not None
+        assert self.fixed_E_z is not None and self.fixed_E_z.value is not None
+        assert self.fixed_H_x is not None and self.fixed_H_x.value is not None
+        assert self.fixed_H_y is not None and self.fixed_H_y.value is not None
+        assert self.fixed_H_z is not None and self.fixed_H_z.value is not None
 
     assert self.input_name and self.input_length and self.input_width and self.input_height
     assert self.wave_value and self.input_phase_shift and self.azimuth_angle and self.elevation_angle
@@ -307,12 +312,12 @@ class pop_up_new_source(NewPopUp):
     self.input_direction = direction
     self.direction_button.text = f'Direction: {direction}'
 
-  def set_filter(self, filter):
+  def set_filter(self, filter_pol):
     """Sets the filter_pol and updates the button display."""
     assert self.filter_pol_button
     self.filter_pol_button.close()
-    self.filter_pol = filter
-    self.filter_pol_button.text = f'Filter pol: {filter}'
+    self.filter_pol = filter_pol
+    self.filter_pol_button.text = f'Filter pol: {filter_pol}'
 
   def set_kind(self, kind: str):
     """Set source kind (MODE or GAUSSIAN) and update UI label."""

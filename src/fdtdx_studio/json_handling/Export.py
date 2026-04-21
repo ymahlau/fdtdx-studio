@@ -291,7 +291,7 @@ class Export:
 				result.update({"__module__": "fdtdx.objects.detectors.phasor",
 												"__name__": "PhasorDetector"})
 			case PoyntingFluxDetector():
-				result.update({"__module__": "fdtdx.objects.detectors.flux",
+				result.update({"__module__": "fdtdx.objects.detectors.poynting_flux",
 												"__name__": "PoyntingFluxDetector"})
 
 		result.update({"color": {

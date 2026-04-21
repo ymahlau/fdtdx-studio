@@ -43,13 +43,16 @@ class simulation_parameters:
     """set courant factor to the given value"""
     self.courant_factor = courant_factor
 
-  
+  VALID_BACKENDS: dict[Literal["gpu", "tpu", "cpu", "METAL"], Literal["gpu", "tpu", "cpu", "METAL"]] = {"gpu": "gpu", "tpu": "tpu", "cpu": "cpu", "METAL": "METAL"}
   def config(self):
     """FDTDX method for Parameters"""
+    if self.backend not in self.VALID_BACKENDS:
+      raise ValueError(f"Invalid backend: {self.backend}")
+    backend_key = cast(Literal["gpu", "tpu", "cpu", "METAL"], self.backend)
     return fdtdx.SimulationConfig(
       time= self.time,
       resolution= self.resolution,
-      backend= cast(Literal["gpu", "tpu", "cpu", "METAL"], self.backend),
+      backend= self.VALID_BACKENDS[backend_key],  
       dtype= DTYPE_MAP[self.dtype.value],
       courant_factor= self.courant_factor,
       gradient_config= self.gradient_config,

@@ -187,8 +187,8 @@ class BaseDetectorPopup(NewPopUp):
         assert self.input_height is not None
         assert self.input_name is not None
 
-        cast(Any, self.color_show).text = 'Color: Red'
-        self.input_color = 'Red'
+        self.color_show.set_value('#FF0000')
+        self.input_color = '#FF0000'
         self.input_length.value = 1
         self.input_width.value = 1
         self.input_height.value = 1

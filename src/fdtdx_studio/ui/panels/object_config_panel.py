@@ -209,14 +209,16 @@ class ObjectConfigPanel():
   
 
   def add_con_to_scroll_and_dict(self, con):
-    if self.scroll_area_con is not None:  
-      with self.scroll_area_con:
-        with ui.row() as row:
-          ui.button(con['key'], on_click=lambda: self.pop_up_con.open_pop_up(con['type'], self.name_of_all_objects, con), color=None).props('flat')
-          ui.button(icon='delete', on_click=lambda e = con['key']: self.delete_con(e), color=None).props('flat')
+    self.cons[con['key']] = con
+    if self.scroll_area_con is None:
+      return  
+    with self.scroll_area_con:
+      with ui.row() as row:
+        ui.button(con['key'], on_click=lambda: self.pop_up_con.open_pop_up(con['type'], self.name_of_all_objects, con), color=None).props('flat')
+        ui.button(icon='delete', on_click=lambda e = con['key']: self.delete_con(e), color=None).props('flat')
+    
+    self.scroll_row[con['key']] = row
       
-      self.scroll_row[con['key']] = row
-      self.cons[con['key']] = con
 
 
   def delete_con(self, name):

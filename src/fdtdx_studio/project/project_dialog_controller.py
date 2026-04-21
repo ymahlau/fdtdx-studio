@@ -71,7 +71,7 @@ class Project_Dialog_Controller:
     
   async def choose_Project(self):
     """Choose the Project the user wants to open"""
-    json = None
+    file_upload = None
     name = None
 
    
@@ -82,15 +82,22 @@ class Project_Dialog_Controller:
 
    
     async def handle_upload(e: events.UploadEventArguments):
-      nonlocal json, name
-      json = await e.file.json()
+      nonlocal file_upload, name
+      file_upload = e.file
       name = e.file.name.replace('.json','')
       save.enable()
       
 
     async def openDialogTree():
       try:
-        project = Project(Name=name,File=json,controller=self.controller)
+        if file_upload is None:
+          self.view.send_error("Please upload a project file first.", 3000)
+          return
+        project = await Project.create_from_file(
+          controller=self.controller,
+          File=file_upload,
+          Name=name,
+        )
         await self.new_scene_controller(project)
       except Exception as e:
         msg = "Invalid File: JSON-Format could not be read" if isinstance(e, KeyError) else repr(e)

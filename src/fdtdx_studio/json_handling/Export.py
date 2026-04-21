@@ -82,9 +82,9 @@ class Export:
 		"""builds the JSON serializable output of all Nonstandard Materials that were defined, calls build material for each"""
 		cfg = []
 		for obj in list_obj:
-			name, material, editable = obj
+			material, name, editable = obj
 			if editable:
-				cfg.append(self.build_material(material))
+				cfg.append(self.build_material(material, name))
 		return cfg
 
 	def build_config(self):
@@ -163,7 +163,7 @@ class Export:
 		}
 
 	#Builds JSON text from Material
-	def build_material(self, obj: fdtdx.Material):
+	def build_material(self, obj: fdtdx.Material, name: str):
 		return {
 			"__module__": "fdtdx.materials",
 			"__name__": name,
@@ -300,7 +300,7 @@ class Export:
 			"__value__": self.hex_to_RGB(obj.color) if isinstance(obj.color, str) else obj.color
 			}})
 
-		match types:
+		match obj:
 			case EnergyDetector():
 				None
 			case FieldDetector() | PhasorDetector():
@@ -317,7 +317,7 @@ class Export:
 										},
 										"exact_interpolation": obj.exact_interpolation})
 
-		match types:
+		match obj:
 			case ModeOverlapDetector():
 				result.update({"filter_pol": obj.filter_pol,
 											"if_inverse_plot_backwards": obj.if_inverse_plot_backwards,

@@ -108,12 +108,12 @@ class pop_up_new_source(NewPopUp):
         is_always_off=self.switch_is_always_off,
       ),
       filter_pol=None if self.source_kind == 'GAUSSIAN' else self.filter_pol,
-      mode_index=None if self.source_kind == 'GAUSSIAN' else self.mode_index.value,
-      radius=None if self.source_kind == 'MODE' else self.radius.value,
-      std=None if self.source_kind == 'MODE' else self.std.value,
+      mode_index=None if self.source_kind == 'GAUSSIAN' or self.mode_index is None else self.mode_index.value,
+      radius=None if self.source_kind == 'MODE' or self.radius is None else self.radius.value,
+      std=None if self.source_kind == 'MODE' or self.std is None else self.std.value,
       normalize_by_energy=None if self.source_kind == 'MODE' else self.normalize_by_energy,
-      fixed_E_polarization_vector=None if self.source_kind == 'MODE' else [self.fixed_E_x.value, self.fixed_E_y.value, self.fixed_E_z.value],
-      fixed_H_polarization_vector=None if self.source_kind == 'MODE' else [self.fixed_H_x.value, self.fixed_H_y.value, self.fixed_H_z.value],
+      fixed_E_polarization_vector=None if self.source_kind == 'MODE' or self.fixed_E_x is None or self.fixed_E_y is None or self.fixed_E_z is None else [self.fixed_E_x.value, self.fixed_E_y.value, self.fixed_E_z.value],
+      fixed_H_polarization_vector=None if self.source_kind == 'MODE' or self.fixed_H_x is None or self.fixed_H_y is None or self.fixed_H_z is None else [self.fixed_H_x.value, self.fixed_H_y.value, self.fixed_H_z.value],
     )
     if self.temporal_profile_type == 'SingleFrequencyProfile':
       kwargs['temporal_profile'] = dict(

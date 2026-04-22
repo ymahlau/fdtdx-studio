@@ -1,4 +1,4 @@
-from typing import Literal, cast
+from typing import Final, Literal, cast
 
 import jax
 import fdtdx
@@ -9,6 +9,8 @@ DTYPE_MAP = {
     "jax.numpy.float32": jnp.float32,
     "jax.numpy.float64": jnp.float64
 }
+
+BackendLiteral = Literal["gpu", "tpu", "cpu", "METAL"]
 class simulation_parameters:
   """Class for the needed simulation Parameters"""
 
@@ -43,16 +45,16 @@ class simulation_parameters:
     """set courant factor to the given value"""
     self.courant_factor = courant_factor
 
-  VALID_BACKENDS: dict[Literal["gpu", "tpu", "cpu", "METAL"], Literal["gpu", "tpu", "cpu", "METAL"]] = {"gpu": "gpu", "tpu": "tpu", "cpu": "cpu", "METAL": "METAL"}
+  VALID_BACKENDS: Final[tuple[BackendLiteral, ...]] = ("gpu", "tpu", "cpu", "METAL")
   def config(self):
     """FDTDX method for Parameters"""
     if self.backend not in self.VALID_BACKENDS:
       raise ValueError(f"Invalid backend: {self.backend}")
-    backend_key = cast(Literal["gpu", "tpu", "cpu", "METAL"], self.backend)
+    backend_value = cast(BackendLiteral, self.backend)
     return fdtdx.SimulationConfig(
       time= self.time,
       resolution= self.resolution,
-      backend= self.VALID_BACKENDS[backend_key],  
+      backend= backend_value,
       dtype= DTYPE_MAP[self.dtype.value],
       courant_factor= self.courant_factor,
       gradient_config= self.gradient_config,

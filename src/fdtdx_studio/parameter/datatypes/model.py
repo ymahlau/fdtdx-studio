@@ -144,13 +144,14 @@ class Model(Constraints):
             self.track_object_list.append(obj)
         return obj
     
-    def create_pml_boundary_obj(self, thickness:int | None = None):
+    def create_pml_boundary_obj(self, thickness:int):
         
         # Remove existing PML boundaries
         for obj in list(self.track_object_list):
             if isinstance(obj, fdtdx.PerfectlyMatchedLayer):
                 self.delete_by_object(obj)
-        assert isinstance(thickness, int)
+        if not isinstance(thickness, int):
+            raise TypeError(f"thickness must be an integer, got {type(thickness).__name__}")
         bound_cfg = fdtdx.BoundaryConfig.from_uniform_bound(thickness=thickness, boundary_type="pml")
         bound_dict, c_list = fdtdx.boundary_objects_from_config(bound_cfg, self.track_object_list[0])
         

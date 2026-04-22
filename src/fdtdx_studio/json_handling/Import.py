@@ -1,7 +1,9 @@
+from typing import Any
+
 from nicegui import ui
 from pathlib import Path
 
-from sphinx.project import Project
+from fdtdx_studio.project.project import Project
 from fdtdx_studio.parameter.DType import DType
 import json
 from fdtdx_studio.parameter.datatypes.model import Model
@@ -214,10 +216,7 @@ class Import:
 
 
   #iterates over every object in the JSON and calls the correct importer for each
-  async def import_objects(self, Project: ui.upload.FileUpload):
-    file_bytes = await Project.read()
-    project_data = json.loads(file_bytes.decode('utf-8'))
-
+  def import_objects(self, project_data: list[dict[str, Any]]):
     pml_imported = False
     # As we create new PMLs that willhave different names, we need to delete their existing constraints from the import
     delete_constraint = []
@@ -244,13 +243,21 @@ class Import:
     self.project.model.list_to_constraints(constraints)
 
 
+  async def _extract_project_data(self, project_source: Any):
+    """Extract project data from either uploaded file or already-decoded JSON."""
+    if isinstance(project_source, list):
+      return project_source
+    if hasattr(project_source, 'read'):
+      file_bytes = await project_source.read()
+      return json.loads(file_bytes.decode('utf-8'))
+    raise TypeError("Unsupported project input type for import")
+
   #gets the complete JSON as a dictionary, extracts the Simulation Config and Simulation Volume, calls the importer for all other objects
-  async def import_from(self, Project: ui.upload.FileUpload):
+  async def import_from(self, project_source: Any):
     """Opens Project from existing File"""
     self.project.objects =[None]
     self.project.model = Model(self.project.objects)
-    file_bytes = await Project.read()
-    project_data = json.loads(file_bytes.decode('utf-8'))
+    project_data = await self._extract_project_data(project_source)
     config = project_data[0]
     volume = project_data[1]
 
@@ -263,7 +270,7 @@ class Import:
                                                                        name= volume['material'].get('__name__', 'Unknown Material') )
       )
 
-    await self.import_objects(Project)
+    self.import_objects(project_data)
     self.project.param.set_backend(config['backend'])
     self.project.param.set_time(config['time'])
     self.project.param.set_resolution(config['resolution'])

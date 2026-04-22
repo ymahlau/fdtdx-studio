@@ -49,12 +49,45 @@ export default {
                 return group;
             };
 
+            // Function to create a text sprite
+            const createTextSprite = (text, colorHex) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 64;
+                canvas.height = 64;
+                const context = canvas.getContext('2d');
+                context.font = 'Bold 36px Arial';
+                // Convert number to hex string for color
+                context.fillStyle = '#' + colorHex.toString(16).padStart(6, '0');
+                context.textAlign = 'center';
+                context.textBaseline = 'middle';
+                context.fillText(text, 32, 32);
+
+                const texture = new THREE.CanvasTexture(canvas);
+                const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false, depthWrite: false });
+                const sprite = new THREE.Sprite(spriteMaterial);
+                // Size of the text sprite
+                sprite.scale.set(10, 10, 1);
+                return sprite;
+            };
+
             const axesGroup = new THREE.Group();
 
             // X (Red), Y (Green), Z (Blue)
             const xAxis = createAxis(0xee3333, new THREE.Vector3(1, 0, 0));
             const yAxis = createAxis(0x33ee33, new THREE.Vector3(0, 1, 0));
             const zAxis = createAxis(0x3333ee, new THREE.Vector3(0, 0, 1));
+            
+            const xLabel = createTextSprite('x', 0xee3333);
+            xLabel.position.set(24, 0, 0);
+            xAxis.add(xLabel);
+
+            const yLabel = createTextSprite('y', 0x33ee33);
+            yLabel.position.set(0, 24, 0);
+            yAxis.add(yLabel);
+
+            const zLabel = createTextSprite('z', 0x3333ee);
+            zLabel.position.set(0, 0, 24);
+            zAxis.add(zLabel);
             axesGroup.add(xAxis, yAxis, zAxis);
 
             // Center sphere focus dot
@@ -209,6 +242,7 @@ export default {
 
         // Traverse and dispose materials/geometries to prevent memory leaks in Three.js
         if (this.scene) {
+            const spritesToRemove = [];
             this.scene.traverse((object) => {
                 if (object.isMesh) {
                     object.geometry.dispose();
@@ -217,6 +251,19 @@ export default {
                     } else if (Array.isArray(object.material)) {
                         object.material.forEach(mat => mat.dispose());
                     }
+                } else if (object.isSprite || object instanceof THREE.Sprite) {
+                    if (object.material) {
+                        if (object.material.map) {
+                            object.material.map.dispose();
+                        }
+                        object.material.dispose();
+                    }
+                    spritesToRemove.push(object);
+                }
+            });
+            spritesToRemove.forEach(sprite => {
+                if (sprite.parent) {
+                    sprite.parent.remove(sprite);
                 }
             });
         }

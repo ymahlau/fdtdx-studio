@@ -1,4 +1,5 @@
 from nicegui import ui
+from pathlib import Path
 from fdtdx_studio.ui.scene_3d.main_section import MainSection
 from fdtdx_studio.ui.panels.material_object_config_panel import MaterialObjectConfigPanel as MaterialObjectConfigurationPanel
 from fdtdx_studio.ui.panels.detector_panel import DetectorConfigurationPanel
@@ -73,7 +74,8 @@ class View:
     '''
     with ui.header().style('background-color: #17032B').classes('items-center justify-between').style('padding: 0px;') as self.header:
       with ui.row().classes('items-center').style('margin-left: 8px;'):
-        ui.image("fdtdx_studio/fdtdx.svg").style('height: 24px; width: 24px; margin-left: 16px;')
+        logo_path = Path(__file__).parent.parent / 'fdtdx.svg'
+        ui.image(logo_path).style('height: 24px; width: 24px; margin-left: 16px;')
         ui.label('FDTDX Studio').style('color: #BE44E4; font-size: 24px; margin-left: 0px; font-weight: bold; align-self: center;')
       with ui.row().classes('items-center justify-end').style('margin-right: 4px;'):
         ui.button(icon= 'help', color = None).props('flat').style('padding: 0px; color:#F3E155;').on_click(lambda: ui.navigate.to('https://fdtdx.readthedocs.io/en/latest/', new_tab= True)) 

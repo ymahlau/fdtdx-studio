@@ -124,7 +124,6 @@ class Project_Dialog_Controller:
 
     # config dialog for starting new project 
     def actual_config_dialog():
-      self.view.left_drawer.Volume_Panel.Volume_panel()
       with ui.dialog() as dialogFirstConfig, ui.card():
         self.view.right_drawer.simparpanel.simulation_param_panel(dialogFirstConfig)
       dialogFirstConfig.props('persistent')

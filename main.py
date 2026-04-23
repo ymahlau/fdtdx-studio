@@ -25,7 +25,7 @@ from typing import Optional
 @dataclass
 class UIConfig:
     title: str = "FDTDX Studio"
-    favicon: str = "src/fdtdx_studio/fdtdx.svg"
+    favicon: str = "src/img/fdtdx.svg"
     port: int = 8080
     host: str = "127.0.0.1"
     # TODO later change to dark=None when we support dark mode

@@ -3,7 +3,7 @@ from pathlib import Path
 from nicegui import ui
 
 from fdtdx_studio.project.project import Project
-from fdtdx_studio.project.project_dialog_controller import Project_Dialog_Controller
+from fdtdx_studio.ui.project_dialog_controller import Project_Dialog_Controller
 from fdtdx_studio.ui.panels.detector_panel import DetectorConfigurationPanel
 from fdtdx_studio.ui.panels.material_object_config_panel import (
     MaterialObjectConfigPanel as MaterialObjectConfigurationPanel,
@@ -83,7 +83,7 @@ class View:
             .style("padding: 0px;") as self.header
         ):
             with ui.row().classes("items-center").style("margin-left: 8px;"):
-                logo_path = Path(__file__).parent.parent / "fdtdx.svg"
+                logo_path = Path(__file__).parent.parent.parent.parent / "img" / "fdtdx.svg"
                 ui.image(logo_path).style("height: 24px; width: 24px; margin-left: 16px;")
                 ui.label("FDTDX Studio").style(
                     "color: #BE44E4; font-size: 24px; margin-left: 0px; font-weight: bold; align-self: center;"

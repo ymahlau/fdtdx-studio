@@ -1,7 +1,13 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from nicegui import events, ui
 
 from fdtdx_studio.project.project import Project
-from fdtdx_studio.ui.ui_view import View
+
+if TYPE_CHECKING:
+    from fdtdx_studio.ui.ui_view import View
 
 
 class Project_Dialog_Controller:

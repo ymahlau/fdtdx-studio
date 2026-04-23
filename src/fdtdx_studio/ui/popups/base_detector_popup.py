@@ -1,5 +1,5 @@
-from typing import Any, cast
 from nicegui import ui
+
 from fdtdx_studio.ui.popups.new_pop_up import new_pop_up as NewPopUp
 
 
@@ -20,7 +20,10 @@ class BaseDetectorPopup(NewPopUp):
     # Must be overridden by subclasses (e.g. 'FIELD', 'POWER')
     DETECTOR_TYPE = None
 
-    def __init__(self, controller, ):
+    def __init__(
+        self,
+        controller,
+    ):
         # >>> UI ONLY <<<
         # Store controller reference, but do NOT call it here
         super().__init__(controller)
@@ -32,7 +35,7 @@ class BaseDetectorPopup(NewPopUp):
 
         # Button configuration:
         # clicking the button will trigger _call_add()
-        self.button_label = 'Add Detector'
+        self.button_label = "Add Detector"
         self.button_function = lambda: self._call_add()
 
     # --------------------------------------------------
@@ -52,14 +55,13 @@ class BaseDetectorPopup(NewPopUp):
         # >>> UI ONLY <<<
         with parent:
             with ui.row():
-
                 # LEFT COLUMN: common detector parameters
                 with ui.column():
                     self.build_common_ui()
                 # RIGHT COLUMN: detector-specific parameters
                 with ui.column():
                     self.build_detector_specific_ui()
-                    
+
         # change standard values of size according to detector standards
         assert self.input_width is not None
         assert self.input_length is not None
@@ -68,9 +70,9 @@ class BaseDetectorPopup(NewPopUp):
         self.input_width.value = 10e-6
         self.input_length.value = 10e-6
         self.input_height.value = 0
-        #Makes Sure teh first detector is also named New Detector
+        # Makes Sure teh first detector is also named New Detector
         assert self.input_name is not None
-        self.input_name.value = 'New Detector'
+        self.input_name.value = "New Detector"
         # Button wired to self._call_add() CONTROLLERANBINDUG
         self.add_button(self.button_function, self.button_label)
 
@@ -82,7 +84,7 @@ class BaseDetectorPopup(NewPopUp):
         to add their specific UI elements.
         """
         # >>> UI ONLY <<<
-        ui.label('Detector')
+        ui.label("Detector")
 
     # --------------------------------------------------
     # DATA COLLECTION (UI → Python data)
@@ -101,11 +103,11 @@ class BaseDetectorPopup(NewPopUp):
         assert self.input_height is not None
         # >>> UI ONLY <<<
         return {
-            'name': self.input_name.value,
-            'length': self.input_length.value,
-            'width': self.input_width.value,
-            'height': self.input_height.value,
-            'color': self.input_color,
+            "name": self.input_name.value,
+            "length": self.input_length.value,
+            "width": self.input_width.value,
+            "height": self.input_height.value,
+            "color": self.input_color,
         }
 
     def collect_detector_kwargs(self) -> dict:
@@ -129,29 +131,24 @@ class BaseDetectorPopup(NewPopUp):
         to the controller.
         """
 
-
         if self.DETECTOR_TYPE is None:
-            raise RuntimeError('DETECTOR_TYPE must be set in subclass')
+            raise RuntimeError("DETECTOR_TYPE must be set in subclass")
 
         # >>> CONTROLLER ENTRY <<<
         self.controller.add_new_detector(
             detector_type=self.DETECTOR_TYPE,
-
             # reference passed back so controller can reset fields
             popup=self,
-
             # tells the controller where to list the detector in the UI
-            typ='scrollarea_sim_detectors',
-
+            typ="scrollarea_sim_detectors",
             # common parameters (name, geometry, color)
             **self.collect_common_kwargs(),
-
             # detector-specific parameters (field, average, normalize, ...)
             **self.collect_detector_kwargs(),
         )
         # Close the dialog if an owner was provided by the dialog wrapper.
         # This is the ONLY place where the popup closes the dialog.
-        if getattr(self, '_dialog_owner', None) is not None:
+        if getattr(self, "_dialog_owner", None) is not None:
             try:
                 assert self._dialog_owner is not None
                 self._dialog_owner.close()
@@ -187,9 +184,9 @@ class BaseDetectorPopup(NewPopUp):
         assert self.input_height is not None
         assert self.input_name is not None
 
-        self.color_show.set_value('#FF0000')
-        self.input_color = '#FF0000'
+        self.color_show.set_value("#FF0000")
+        self.input_color = "#FF0000"
         self.input_length.value = 1
         self.input_width.value = 1
         self.input_height.value = 1
-        self.input_name.value = 'New Detector'
+        self.input_name.value = "New Detector"

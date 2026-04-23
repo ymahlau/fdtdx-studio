@@ -1,4 +1,5 @@
 from nicegui import ui
+
 from fdtdx_studio.ui.popups.base_detector_popup import BaseDetectorPopup
 
 
@@ -18,12 +19,12 @@ class FieldDetectorPopup(BaseDetectorPopup):
 
     # Used by BaseDetectorPopup._call_add()
     # >>> CONTROLLER DISPATCH KEY <<<
-    DETECTOR_TYPE = 'FIELD'
+    DETECTOR_TYPE = "FIELD"
 
     def __init__(self, controller):
         # >>> UI ONLY <<<
         # Initialize detector-specific input references
-        
+
         self.input_average = None
         self.input_normalize = None
 
@@ -41,11 +42,10 @@ class FieldDetectorPopup(BaseDetectorPopup):
         This method is called from BaseDetectorPopup.build_dialog_inside().
         """
         # >>> UI ONLY <<<
-        
-        ui.label('Field Components') \
-            .style('font-size: 14px; font-weight: bold; margin-bottom: 6px')
 
-        ALL_COMPONENTS = ['Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz']
+        ui.label("Field Components").style("font-size: 14px; font-weight: bold; margin-bottom: 6px")
+
+        ALL_COMPONENTS = ["Ex", "Ey", "Ez", "Hx", "Hy", "Hz"]
 
         # 👉 EINZIGE QUELLE DER WAHRHEIT
         self.component_enabled = {c: True for c in ALL_COMPONENTS}
@@ -56,14 +56,14 @@ class FieldDetectorPopup(BaseDetectorPopup):
             btn = self._component_buttons[c]
             if self.component_enabled[c]:
                 # 🔵 aktiv = blau
-                btn.props(remove='outline')
-                btn.props('unelevated color=primary')
+                btn.props(remove="outline")
+                btn.props("unelevated color=primary")
             else:
                 # ⚪ inaktiv = weiß
-                btn.props(remove='unelevated color=primary')
-                btn.props('outline')
+                btn.props(remove="unelevated color=primary")
+                btn.props("outline")
 
-        with ui.row().classes('gap-2'):
+        with ui.row().classes("gap-2"):
             for comp in ALL_COMPONENTS:
 
                 def on_click(c=comp):
@@ -74,11 +74,9 @@ class FieldDetectorPopup(BaseDetectorPopup):
                 self._component_buttons[comp] = btn
                 sync_button(comp)
 
-
-
         # Optional detector behavior flags
-        self.input_average = ui.checkbox('Spatial Average', value=False)
-        self.input_normalize = ui.checkbox('Normalize', value=False)
+        self.input_average = ui.checkbox("Spatial Average", value=False)
+        self.input_normalize = ui.checkbox("Normalize", value=False)
 
     # --------------------------------------------------
     # DATA COLLECTION (UI → Controller)
@@ -95,11 +93,9 @@ class FieldDetectorPopup(BaseDetectorPopup):
         assert self.input_average is not None
         assert self.input_normalize is not None
         return {
-            'components': tuple(
-                c for c, enabled in self.component_enabled.items() if enabled
-            ),
-            'average': self.input_average.value,
-            'normalize': self.input_normalize.value,
+            "components": tuple(c for c, enabled in self.component_enabled.items() if enabled),
+            "average": self.input_average.value,
+            "normalize": self.input_normalize.value,
         }
 
     # --------------------------------------------------
@@ -120,13 +116,12 @@ class FieldDetectorPopup(BaseDetectorPopup):
         for c in self.component_enabled:
             self.component_enabled[c] = True
 
-
             btn = self._component_buttons.get(c)
             if btn:
                 # ALLES Relevante zurücksetzen
-                btn.props(remove='outline unelevated color=primary')
+                btn.props(remove="outline unelevated color=primary")
                 # explizit wieder blau setzen
-                btn.props('unelevated color=primary')
+                btn.props("unelevated color=primary")
 
         assert self.input_average is not None
         assert self.input_normalize is not None

@@ -1,15 +1,23 @@
-from .object_config_panel import ObjectConfigPanel
-from .gaussian_source_panel import GaussianSourcePanel
-from .mode_source_panel import ModeSourcePanel
-from .material_object_config_panel import MaterialObjectConfigPanel
-from .field_detector_panel import FieldDetectorPanel
 from .energy_detector_panel import EnergyDetectorPanel
-from .poynting_flux_detector_panel import PoyntingFluxDetectorPanel
-from .mode_overlap_detector_panel import ModeOverlapDetectorPanel
-from .phasor_detector_panel import PhasorDetectorPanel
+from .field_detector_panel import FieldDetectorPanel
+from .gaussian_source_panel import GaussianSourcePanel
+from .material_object_config_panel import MaterialObjectConfigPanel
 from .material_panel import Material_panel
+from .mode_overlap_detector_panel import ModeOverlapDetectorPanel
+from .mode_source_panel import ModeSourcePanel
+from .object_config_panel import ObjectConfigPanel
+from .phasor_detector_panel import PhasorDetectorPanel
+from .poynting_flux_detector_panel import PoyntingFluxDetectorPanel
 
 __all__ = [
-  "ObjectConfigPanel", "GaussianSourcePanel", "ModeSourcePanel",
-  "MaterialObjectConfigPanel", "FieldDetectorPanel", "EnergyDetectorPanel", "PoyntingFluxDetectorPanel",
-  "ModeOverlapDetectorPanel", "PhasorDetectorPanel", "Material_panel"]
+    "EnergyDetectorPanel",
+    "FieldDetectorPanel",
+    "GaussianSourcePanel",
+    "MaterialObjectConfigPanel",
+    "Material_panel",
+    "ModeOverlapDetectorPanel",
+    "ModeSourcePanel",
+    "ObjectConfigPanel",
+    "PhasorDetectorPanel",
+    "PoyntingFluxDetectorPanel",
+]

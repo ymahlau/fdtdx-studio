@@ -82,7 +82,7 @@ class pop_up_new_material(NewPopUp):
     @ui.refreshable
     def make_source_mode_options(self):
         """Makes a refreshable part of the Dialog that changes based on which Input Type is selected"""
-        # Different Input types have not been implemented completely according to the TNT´s wishes. The Code is there and can be used if needed.
+        # Different Input types have not been implemented completely according to the TNT's wishes. The Code is there and can be used if needed.
         name = "Unknown Material"
 
         def setName(new):
@@ -121,17 +121,17 @@ class pop_up_new_material(NewPopUp):
             ui.label("Name").style("font-size: 13px; font-weight: bold;")
             ui.input(value="Unknown Material", on_change=lambda e: setName(e.value))
             ui.label("Permittivity").style("font-size: 13px; font-weight: bold;")
-            with ui.row().classes("w-full flex-nowrap gap-1") as permittivity:
+            with ui.row().classes("w-full flex-nowrap gap-1"):
                 pittyX = ui.number("x", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
                 pittyY = ui.number("y", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
                 pittyZ = ui.number("z", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
             ui.label("Permeability").style("font-size: 13px; font-weight: bold;")
-            with ui.row().classes("w-full flex-nowrap gap-1") as permeability:
+            with ui.row().classes("w-full flex-nowrap gap-1"):
                 permX = ui.number("x", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
                 permY = ui.number("y", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
                 permZ = ui.number("z", value=1.0, min=0, step=0.1, validation=self._validate).classes("w-1/6")
             ui.label("Electric_conductivity").style("font-size: 13px; font-weight: bold;")
-            with ui.row().classes("w-full flex-nowrap gap-1") as electric_conductivity:
+            with ui.row().classes("w-full flex-nowrap gap-1"):
                 e_condX = ui.number(
                     "x", value=0.0, min=0, max=1.0, step=0.1, validation=self._validate_conductivity
                 ).classes("w-1/6")
@@ -142,7 +142,7 @@ class pop_up_new_material(NewPopUp):
                     "z", value=0.0, min=0, max=1.0, step=0.1, validation=self._validate_conductivity
                 ).classes("w-1/6")
             ui.label("Magnetic_conductivity").style("font-size: 13px; font-weight: bold;")
-            with ui.row().classes("w-full flex-nowrap gap-1") as magnetic_conductivity:
+            with ui.row().classes("w-full flex-nowrap gap-1"):
                 m_condX = ui.number(
                     "x", value=0.0, min=0, max=1.0, step=0.1, validation=self._validate_conductivity
                 ).classes("w-1/6")

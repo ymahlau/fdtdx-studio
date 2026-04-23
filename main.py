@@ -1,5 +1,5 @@
 """
-FDTDX Studio – entry point.
+FDTDX Studio - entry point.
 
 Configure the server via CLI flags or by editing the UIConfig defaults below.
 
@@ -14,6 +14,7 @@ CLI examples
 from __future__ import annotations
 
 import argparse
+import os as _os
 import pathlib
 import sys
 from dataclasses import dataclass
@@ -41,10 +42,10 @@ class UIConfig:
         """Resolve favicon path, then return a dict ready for ui.run(**kwargs)."""
         favicon: Optional[str] = self.favicon or None
         if favicon and not favicon.startswith(("http://", "https://")):
-            # Only validate local paths – URLs are passed through as-is
+            # Only validate local paths - URLs are passed through as-is
             p = pathlib.Path(favicon)
             if not p.is_file():
-                print(f"[config] favicon not found at {p} – skipping")
+                print(f"[config] favicon not found at {p} - skipping")
                 favicon = None
 
         kwargs = dict(
@@ -72,7 +73,7 @@ def _build_parser() -> argparse.ArgumentParser:
     d = UIConfig()  # pull defaults from the dataclass
     p = argparse.ArgumentParser(
         prog="fdtdx-studio",
-        description="FDTDX Studio – NiceGUI simulation front-end",
+        description="FDTDX Studio - NiceGUI simulation front-end",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--title", default=d.title, help="Browser tab title")
@@ -139,8 +140,8 @@ def _register_pages() -> None:
     a dry-run or a plain ``import main``.
 
     Called in two places:
-      1. _run()  – by the parent process, just before ui.run().
-      2. The reload-worker hook below – by uvicorn worker processes that
+      1. _run()  - by the parent process, just before ui.run().
+      2. The reload-worker hook below - by uvicorn worker processes that
          re-import this module from scratch and therefore never reach main().
     """
     from nicegui import ui
@@ -161,8 +162,6 @@ def _run(cfg: UIConfig) -> None:
 
 
 # Reload-worker hook
-
-import os as _os
 
 if _os.environ.get("NICEGUI_WORKER"):
     _register_pages()

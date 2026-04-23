@@ -20,7 +20,7 @@ class Import:
     def import_UMO(self, obj):
         matName = obj["material"].get("__name__", "Unknown Material")
         try:
-            material = self.project.model.material.get_material_from_settings(
+            self.project.model.material.get_material_from_settings(
                 permittivity=obj["material"]["permittivity"],
                 permeability=obj["material"]["permeability"],
                 e_conductivity=obj["material"]["electric_conductivity"],
@@ -28,7 +28,7 @@ class Import:
                 name=matName,
             )
         except Exception:
-            raise Exception(f"Import error: could not find material ‚{matName}")
+            raise Exception(f"Import error: could not find material ,{matName}")
 
         self.project.model.create_material_obj(
             name=obj["name"],
@@ -253,7 +253,7 @@ class Import:
 
                     # There is only one PML consisting of 6 sides (each side is an own object), but instead of importing 6 objects, we create a new PML here
                     # (this is also why we need to delete existing constraints that refer to the old PML objects)
-                    if pml_imported == False:
+                    if not pml_imported:
                         pml_imported = True
                         self.project.model.create_pml_boundary_obj(item["partial_grid_shape"]["__value__"][0])
         self.project.model.list_to_constraints(constraints)

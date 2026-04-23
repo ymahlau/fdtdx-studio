@@ -142,7 +142,7 @@ class LeftDrawer:
                 container = self.scrollarea_sim_detector
             case "PerfectlyMatchedLayer":
                 container = None
-                if object[0] != None:
+                if object[0] is not None:
                     assert self.pml_thickness is not None
                     self.pml_thickness.value = object[0]
             case _:
@@ -166,7 +166,7 @@ class LeftDrawer:
         type obj: tuple
         """
         with self.scrollarea_materials:
-            with ui.row() as row:
+            with ui.row():
                 ui.button(obj[0], on_click=lambda e=obj: self.controller.view_material(e), color=None).props("flat")
                 if obj[2]:
                     ui.button(
@@ -190,7 +190,7 @@ class LeftDrawer:
         IsUsed = False
         usedIn = []
         for obj in self.controller.project.objects:
-            if type(obj) == UniformMaterialObject or type(obj) == SimulationVolume:
+            if isinstance(obj, (UniformMaterialObject, SimulationVolume)):
                 if self.controller.model.material.get_name_from_material(obj.material) == material[0]:
                     IsUsed = True
                     usedIn.append(obj)

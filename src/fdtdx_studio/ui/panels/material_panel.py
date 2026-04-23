@@ -153,7 +153,7 @@ class Material_panel(ObjectConfigPanel):
                     # magnetic_conductivityY = ui.number('y', value= self.magnetic_conductivityY, min= 0, max= 1.0, step= 0.1, validation= self._validate_conductivity).classes('flex-1').props('dense').bind_enabled_from(self, 'is_readonly', backward=lambda x: not x)
                     # magnetic_conductivityZ = ui.number('z', value= self.magnetic_conductivityZ, min= 0, max= 1.0, step= 0.1, validation= self._validate_conductivity).classes('flex-1').props('dense').bind_enabled_from(self, 'is_readonly', backward=lambda x: not x)
 
-                if self.is_readonly == False:
+                if not self.is_readonly:
                     # Button for changing in XYZ Values
                     # ui.button('Apply Changes',on_click= lambda: self.update_material(name.value, [permittivityX.value,permittivityY.value,permittivityZ.value],[permeabilityX.value,permeabilityY.value,permeabilityZ.value],[electric_conductivityX.value,electric_conductivityY.value,electric_conductivityZ.value],[magnetic_conductivityX.value,magnetic_conductivityY.value,magnetic_conductivityZ.value]))
                     # Button for Changing in Scalar Values

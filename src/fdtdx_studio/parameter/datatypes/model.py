@@ -9,6 +9,7 @@ from fdtdx_studio.parameter.material.material import Material
 
 class Model(Constraints):
     def __init__(self, object_list):
+        super().__init__()
         self.current = 0
         self.track_object_list = object_list
         # self.constraints= []
@@ -40,9 +41,9 @@ class Model(Constraints):
     # Just makes a Uniform Material Object for now
     # TODO depricate
     def create_new_dict(self, name, length, width, height):
-        obj = UniformMaterialObject(
+        UniformMaterialObject(  # type: ignore
             partial_real_shape=(height, width, length), name=name, partial_real_position=(0, 0, 0)
-        )  # type: ignore
+        )
 
     def get_track_object_list(self):
         return self.track_object_list

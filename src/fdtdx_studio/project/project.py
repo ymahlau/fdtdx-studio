@@ -54,7 +54,6 @@ class Project:
     def save_Project(self):
         """Saves Project under Project Name. asks for name if none exists"""
         if self.name is not None:
-            path = self.name.__add__("/data")
             self.exporter.export()
         else:
             self.save_Project_as()
@@ -190,7 +189,7 @@ class Project:
                 await self.importer.import_material_list(importMaterial)
                 self.controller.ui_update()
                 return True
-            except:
+            except Exception:
                 ui.notify("tried loading invalid Material list")
                 print("tried loading invalid Material list")
                 return False

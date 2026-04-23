@@ -71,9 +71,6 @@ class AutoConfigPanel(ObjectConfigPanel):
 
         current_type = self._get_current_type_name()
 
-        # Title handling
-        title = f"{current_type} Configuration"
-
         with self.main_panel_container:
             # Navigation Header if nested
             if self.current_nested_path:
@@ -110,8 +107,6 @@ class AutoConfigPanel(ObjectConfigPanel):
         key = definition.name
         current_val = self._get_current_value(key, definition.default)
 
-        # Specific validation or callback
-        validation_cb = None
         if key == "name" and not self.current_nested_path:  # Top level name
             pass
 

@@ -4,8 +4,9 @@ from fdtdx import GridCoordinateConstraint, PositionConstraint, SizeConstraint, 
 
 
 class Constraints:
-    constraints = {}
-    _cons = 0
+    def __init__(self) -> None:
+        self.constraints: dict = {}
+        self._cons: int = 0
 
     # Functions to add Constraints
     def uniqueName(self, key: str | None = None):
@@ -117,12 +118,12 @@ class Constraints:
             self.constraints.pop(k)
 
     def list_to_constraints(self, liste):
-        for l in liste:
-            if isinstance(l, list):
-                if l[0] != "NoneGiven":
-                    self.constraints[self.uniqueName(l[0])] = l[1]
+        for item in liste:
+            if isinstance(item, list):
+                if item[0] != "NoneGiven":
+                    self.constraints[self.uniqueName(item[0])] = item[1]
             else:
-                self.constraints[self.uniqueName()] = l
+                self.constraints[self.uniqueName()] = item
 
     # Maybe just dont give them names to reduce work
     def update_object_names(self, old, new):

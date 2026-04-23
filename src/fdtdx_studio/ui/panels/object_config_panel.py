@@ -319,7 +319,7 @@ class ObjectConfigPanel:
             float(value)
             return None
         except (ValueError, TypeError):
-            if value != None:
+            if value is not None:
                 return "Must be a number"
             return None
 
@@ -443,7 +443,6 @@ class ObjectConfigPanel:
             "#ffa500": "Orange",
             "#FFA500": "Orange",
             "#800080": "Purple",
-            "#800080": "Purple",
             "#00ffff": "Cyan",
             "#00FFFF": "Cyan",
             "#ffc0cb": "Pink",
@@ -451,8 +450,6 @@ class ObjectConfigPanel:
             "#ffff00": "Yellow",
             "#FFFF00": "Yellow",
             "#808080": "Gray",
-            "#808080": "Gray",
-            "#000000": "Black",
             "#000000": "Black",
         }
         return color_map.get(color_hex, color_hex)  # Return hex if name not found

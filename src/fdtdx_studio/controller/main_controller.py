@@ -129,7 +129,7 @@ class Controller:
         """adds new gaussian source to the model list"""
 
         if wave:
-            wave_character = fdtdx.WaveCharacter(**wave)
+            wave_character = fdtdx.WaveCharacter(**wave)  # noqa: F841
         if switch:
             switch = fdtdx.OnOffSwitch(**switch)
         temporal_profile_type = temporal_profile.pop("type") if temporal_profile else None
@@ -396,7 +396,7 @@ class Controller:
         """namechecks materials to prevent materials with the same name, and auto incerements if same name already exists"""
         for obj in list:
             if obj[0] == name:
-                if obj[2] == False:
+                if not obj[2]:
                     name = "Custom " + name
                 else:
                     if name[-2] == str(index - 1) and name[-1] == ")":

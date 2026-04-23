@@ -78,7 +78,7 @@ class Pop_up_constraints:
             if value is not None:
                 if any(item in key for item in coor):
                     result[key[:-2]] = (
-                        (value,) if key[:-2] not in result.keys() else cast(tuple, result[key[:-2]]) + (value,)
+                        (value,) if key[:-2] not in result.keys() else (*cast(tuple, result[key[:-2]]), value)
                     )
                 else:
                     result[key] = value

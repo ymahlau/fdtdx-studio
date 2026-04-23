@@ -1,3 +1,5 @@
+import ast
+import os
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -194,9 +196,6 @@ OBJECT_DEFINITIONS: Dict[str, List[AttributeDef]] = {
         AttributeDef("period", "Period", "number", 5),
     ],
 }
-
-import ast
-import os
 
 
 def _get_fdtdx_source_files():

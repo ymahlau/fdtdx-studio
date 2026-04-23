@@ -295,7 +295,7 @@ class SourcePanel(ObjectConfigPanel):
             if value is None or value == "":
                 return None
         except (ValueError, TypeError):
-            if value != None:
+            if value is not None:
                 return "Input must be a float number like 0.0"
             return None
 

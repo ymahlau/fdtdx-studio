@@ -19,9 +19,13 @@ class volume_panel:
         self.controller = controller
 
     def Volume_panel(self):
-        Volume: fdtdx.SimulationVolume = self.controller.project.objects[0]
-        VTuple = Volume.partial_real_shape
-        self.material = Volume.material
+        Volume: fdtdx.SimulationVolume | None = self.controller.project.objects[0]
+        if Volume is not None:
+            VTuple = Volume.partial_real_shape
+            self.material = Volume.material
+        else:
+            VTuple = (1e-5, 1e-5, 1e-5)
+            self.material = fdtdx.Material()
 
         with ui.dialog() as dialogVolume, ui.card():
             ui.label("Simulation Volume").style("font-size: 18px; font-weight: bold;")

@@ -68,7 +68,7 @@ class Model(Constraints):
 
     def get_by_name(self, name):
         for obj in self.track_object_list:
-            if obj.name == name:
+            if obj is not None and obj.name == name:
                 return obj
         return None
 
@@ -543,14 +543,14 @@ class Model(Constraints):
         return 0
 
     def get_object_names(self):
-        return (o.name for o in self.track_object_list)
+        return (o.name for o in self.track_object_list if o is not None)
 
     # returns a dict with objname as key and a tuple of 2 lists (sizes, pos)
     def get_all_dimensions(self, config):
         config = SimulationConfig(**config)
         # resolve_object_constraints returns 2 dicts, one with 3 slices per object for its dimenstions, and one with error messages per object
         objs, errors = fdtdx.resolve_object_constraints(
-            objects=self.track_object_list, constraints=list(self.constraints.values()), config=config
+            objects=[o for o in self.track_object_list if o is not None], constraints=list(self.constraints.values()), config=config
         )
         if not all(e is None for e in errors.values()):
             raise Exception([k for k, v in errors.items() if v is not None])

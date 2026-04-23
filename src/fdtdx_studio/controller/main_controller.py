@@ -384,6 +384,8 @@ class Controller:
         return_list = []
 
         for i in self.model.get_track_object_list():
+            if i is None:
+                continue
             if isinstance(i, fdtdx.PerfectlyMatchedLayer):
                 return_list.append((i.partial_grid_shape[0], i.__class__.__name__))
             else:
@@ -415,6 +417,8 @@ class Controller:
             # should still update left draw with name changes etc cause it does still get saved
             ui_objects = []
             for i in self.model.get_track_object_list():
+                if i is None:
+                    continue
                 if i.__class__.__name__ == "PerfectlyMatchedLayer":
                     ui_objects.append((i.partial_grid_shape[0], i.__class__.__name__))
                 else:

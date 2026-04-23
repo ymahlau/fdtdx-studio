@@ -550,7 +550,9 @@ class Model(Constraints):
         config = SimulationConfig(**config)
         # resolve_object_constraints returns 2 dicts, one with 3 slices per object for its dimenstions, and one with error messages per object
         objs, errors = fdtdx.resolve_object_constraints(
-            objects=[o for o in self.track_object_list if o is not None], constraints=list(self.constraints.values()), config=config
+            objects=[o for o in self.track_object_list if o is not None],
+            constraints=list(self.constraints.values()),
+            config=config,
         )
         if not all(e is None for e in errors.values()):
             raise Exception([k for k, v in errors.items() if v is not None])

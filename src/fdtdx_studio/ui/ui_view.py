@@ -3,11 +3,11 @@ from pathlib import Path
 from nicegui import ui
 
 from fdtdx_studio.project.project import Project
-from fdtdx_studio.ui.project_dialog_controller import Project_Dialog_Controller
 from fdtdx_studio.ui.panels.detector_panel import DetectorConfigurationPanel
 from fdtdx_studio.ui.panels.material_object_config_panel import (
     MaterialObjectConfigPanel as MaterialObjectConfigurationPanel,
 )
+from fdtdx_studio.ui.project_dialog_controller import Project_Dialog_Controller
 from fdtdx_studio.ui.scene_3d.main_section import MainSection
 from fdtdx_studio.ui.ui_elements.left_drawer import LeftDrawer
 from fdtdx_studio.ui.ui_elements.right_drawer import RightDrawer

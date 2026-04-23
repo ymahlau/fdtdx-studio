@@ -10,14 +10,14 @@ from .phasor_detector_panel import PhasorDetectorPanel
 from .poynting_flux_detector_panel import PoyntingFluxDetectorPanel
 
 __all__ = [
-    "ObjectConfigPanel",
-    "GaussianSourcePanel",
-    "ModeSourcePanel",
-    "MaterialObjectConfigPanel",
-    "FieldDetectorPanel",
     "EnergyDetectorPanel",
-    "PoyntingFluxDetectorPanel",
-    "ModeOverlapDetectorPanel",
-    "PhasorDetectorPanel",
+    "FieldDetectorPanel",
+    "GaussianSourcePanel",
+    "MaterialObjectConfigPanel",
     "Material_panel",
+    "ModeOverlapDetectorPanel",
+    "ModeSourcePanel",
+    "ObjectConfigPanel",
+    "PhasorDetectorPanel",
+    "PoyntingFluxDetectorPanel",
 ]

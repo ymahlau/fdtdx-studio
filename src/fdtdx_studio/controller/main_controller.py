@@ -413,7 +413,7 @@ class Controller:
             ui_objects = self.ui_parse_objectlist_scrollarea()
             self.view.main_section.update(ui_objects)
         except Exception as e:
-            self.view.send_error(f"Conflicting constraints for {str(e)}")
+            self.view.send_error(f"Conflicting constraints for {e!s}")
             # should still update left draw with name changes etc cause it does still get saved
             ui_objects = []
             for i in self.model.get_track_object_list():

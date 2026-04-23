@@ -143,9 +143,9 @@ def _register_pages() -> None:
       2. The reload-worker hook below – by uvicorn worker processes that
          re-import this module from scratch and therefore never reach main().
     """
-    from nicegui import ui  # noqa: PLC0415
+    from nicegui import ui
 
-    from fdtdx_studio.controller.main_controller import Controller  # noqa: PLC0415
+    from fdtdx_studio.controller.main_controller import Controller
     # from fdtdx_studio.ui.ui_view import View  # uncomment if needed
 
     @ui.page("/")

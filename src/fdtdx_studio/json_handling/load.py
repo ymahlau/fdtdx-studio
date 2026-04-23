@@ -1,13 +1,10 @@
+import json
 from typing import Any
 
-from nicegui import ui
-from pathlib import Path
-
-from fdtdx_studio.project.project import Project
-from fdtdx_studio.parameter.DType import DType
-import json
-from fdtdx_studio.parameter.datatypes.model import Model
 import fdtdx
+
+from fdtdx_studio.parameter.datatypes.model import Model
+from fdtdx_studio.parameter.dtype import DType
 
 
 class Import:

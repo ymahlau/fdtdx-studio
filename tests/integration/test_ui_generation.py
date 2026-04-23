@@ -33,6 +33,3 @@ class TestUIGeneration(unittest.TestCase):
             defs = {d.name: d for d in OBJECT_DEFINITIONS[det]}
             for attr in common_attrs:
                 self.assertIn(attr, defs, f"{det} missing common attribute {attr}")
-
-if __name__ == '__main__':
-    unittest.main()

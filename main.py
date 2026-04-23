@@ -19,23 +19,23 @@ import sys
 from dataclasses import dataclass
 from typing import Optional
 
-
 # In-code defaults
+
 
 @dataclass
 class UIConfig:
-    title: str                   = "FDTDX Studio"
-    favicon: str                 = "src/fdtdx_studio/fdtdx.svg"
-    port: int                    = 8080
-    host: str                    = "127.0.0.1"
+    title: str = "FDTDX Studio"
+    favicon: str = "src/fdtdx_studio/fdtdx.svg"
+    port: int = 8080
+    host: str = "127.0.0.1"
     # TODO later change to dark=None when we support dark mode
-    dark: Optional[bool]         = False  # None = NiceGUI decides, True/False forces it
-    reconnect_timeout: float     = 3.0
-    show: bool                   = False
-    reload: bool                 = False
-    uvicorn_logging_level: str   = "warning"
-    ssl_keyfile: str             = ""
-    ssl_certfile: str            = ""
+    dark: Optional[bool] = False  # None = NiceGUI decides, True/False forces it
+    reconnect_timeout: float = 3.0
+    show: bool = False
+    reload: bool = False
+    uvicorn_logging_level: str = "warning"
+    ssl_keyfile: str = ""
+    ssl_certfile: str = ""
 
     def to_nicegui_kwargs(self) -> dict:
         """Resolve favicon path, then return a dict ready for ui.run(**kwargs)."""
@@ -48,15 +48,15 @@ class UIConfig:
                 favicon = None
 
         kwargs = dict(
-            title                 = self.title,
-            favicon               = favicon,
-            port                  = self.port,
-            host                  = self.host,
-            dark                  = self.dark,
-            reconnect_timeout     = self.reconnect_timeout,
-            show                  = self.show,
-            reload                = self.reload,
-            uvicorn_logging_level = self.uvicorn_logging_level,
+            title=self.title,
+            favicon=favicon,
+            port=self.port,
+            host=self.host,
+            dark=self.dark,
+            reconnect_timeout=self.reconnect_timeout,
+            show=self.show,
+            reload=self.reload,
+            uvicorn_logging_level=self.uvicorn_logging_level,
         )
         if self.ssl_keyfile:
             kwargs["ssl_keyfile"] = self.ssl_keyfile
@@ -67,6 +67,7 @@ class UIConfig:
 
 # CLI parser
 
+
 def _build_parser() -> argparse.ArgumentParser:
     d = UIConfig()  # pull defaults from the dataclass
     p = argparse.ArgumentParser(
@@ -74,56 +75,61 @@ def _build_parser() -> argparse.ArgumentParser:
         description="FDTDX Studio – NiceGUI simulation front-end",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--title",   default=d.title,  help="Browser tab title")
+    p.add_argument("--title", default=d.title, help="Browser tab title")
     p.add_argument("--favicon", default=d.favicon, help="Path or URL to favicon")
-    p.add_argument("--port",    default=d.port,   type=int)
-    p.add_argument("--host",    default=d.host)
-    p.add_argument("--reconnect-timeout", default=d.reconnect_timeout,
-                   type=float, dest="reconnect_timeout", metavar="SECONDS")
-    p.add_argument("--uvicorn-logging-level", default=d.uvicorn_logging_level,
-                   dest="uvicorn_logging_level",
-                   choices=["critical","error","warning","info","debug","trace"])
-    p.add_argument("--ssl-keyfile",  default=d.ssl_keyfile,  dest="ssl_keyfile",  metavar="PATH")
+    p.add_argument("--port", default=d.port, type=int)
+    p.add_argument("--host", default=d.host)
+    p.add_argument(
+        "--reconnect-timeout", default=d.reconnect_timeout, type=float, dest="reconnect_timeout", metavar="SECONDS"
+    )
+    p.add_argument(
+        "--uvicorn-logging-level",
+        default=d.uvicorn_logging_level,
+        dest="uvicorn_logging_level",
+        choices=["critical", "error", "warning", "info", "debug", "trace"],
+    )
+    p.add_argument("--ssl-keyfile", default=d.ssl_keyfile, dest="ssl_keyfile", metavar="PATH")
     p.add_argument("--ssl-certfile", default=d.ssl_certfile, dest="ssl_certfile", metavar="PATH")
 
     dark_grp = p.add_mutually_exclusive_group()
-    dark_grp.add_argument("--dark",      dest="dark", action="store_true",  default=d.dark)
-    dark_grp.add_argument("--light",     dest="dark", action="store_false")
-    dark_grp.add_argument("--auto-dark", dest="dark", action="store_const", const=None,
-                          help="Let NiceGUI choose (default)")
+    dark_grp.add_argument("--dark", dest="dark", action="store_true", default=d.dark)
+    dark_grp.add_argument("--light", dest="dark", action="store_false")
+    dark_grp.add_argument(
+        "--auto-dark", dest="dark", action="store_const", const=None, help="Let NiceGUI choose (default)"
+    )
 
     show_grp = p.add_mutually_exclusive_group()
-    show_grp.add_argument("--show",    dest="show", action="store_true",  default=d.show)
+    show_grp.add_argument("--show", dest="show", action="store_true", default=d.show)
     show_grp.add_argument("--no-show", dest="show", action="store_false")
 
     reload_grp = p.add_mutually_exclusive_group()
-    reload_grp.add_argument("--reload",    dest="reload", action="store_true", default=d.reload)
+    reload_grp.add_argument("--reload", dest="reload", action="store_true", default=d.reload)
     reload_grp.add_argument("--no-reload", dest="reload", action="store_false")
 
-    p.add_argument("--dry-run", action="store_true",
-                   help="Print resolved config and exit without starting the server")
+    p.add_argument("--dry-run", action="store_true", help="Print resolved config and exit without starting the server")
     return p
 
 
 def _parse_args(argv: list[str] | None = None) -> tuple[UIConfig, bool]:
     ns = _build_parser().parse_args(argv)
     cfg = UIConfig(
-        title                 = ns.title,
-        favicon               = ns.favicon,
-        port                  = ns.port,
-        host                  = ns.host,
-        dark                  = ns.dark,
-        reconnect_timeout     = ns.reconnect_timeout,
-        show                  = ns.show,
-        reload                = ns.reload,
-        uvicorn_logging_level = ns.uvicorn_logging_level,
-        ssl_keyfile           = ns.ssl_keyfile,
-        ssl_certfile          = ns.ssl_certfile,
+        title=ns.title,
+        favicon=ns.favicon,
+        port=ns.port,
+        host=ns.host,
+        dark=ns.dark,
+        reconnect_timeout=ns.reconnect_timeout,
+        show=ns.show,
+        reload=ns.reload,
+        uvicorn_logging_level=ns.uvicorn_logging_level,
+        ssl_keyfile=ns.ssl_keyfile,
+        ssl_certfile=ns.ssl_certfile,
     )
     return cfg, ns.dry_run
 
 
 # App
+
 
 def _register_pages() -> None:
     """Import NiceGUI + app code and register all routes.
@@ -137,7 +143,8 @@ def _register_pages() -> None:
       2. The reload-worker hook below – by uvicorn worker processes that
          re-import this module from scratch and therefore never reach main().
     """
-    from nicegui import ui                                        # noqa: PLC0415
+    from nicegui import ui  # noqa: PLC0415
+
     from fdtdx_studio.controller.main_controller import Controller  # noqa: PLC0415
     # from fdtdx_studio.ui.ui_view import View  # uncomment if needed
 
@@ -149,17 +156,20 @@ def _register_pages() -> None:
 def _run(cfg: UIConfig) -> None:
     _register_pages()
     from nicegui import ui
+
     ui.run(**cfg.to_nicegui_kwargs())
 
 
 # Reload-worker hook
 
 import os as _os
+
 if _os.environ.get("NICEGUI_WORKER"):
     _register_pages()
 
 
 # Entry point
+
 
 def main(argv: list[str] | None = None) -> None:
     cfg, dry_run = _parse_args(argv)

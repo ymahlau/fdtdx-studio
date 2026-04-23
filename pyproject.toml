@@ -10,7 +10,6 @@ requires-python = ">=3.11"
 dependencies = [
     "nicegui>=3.7.1",
     "fdtdx@git+https://github.com/ymahlau/fdtdx.git@df1f8a539bf26fcd0ab059f4fb076ba19a0f1d05",
-
 ]
 
 [project.urls]
@@ -41,6 +40,7 @@ testpaths = ["tests"]
 
 [project.optional-dependencies]
 dev = [
+    "playwright>=1.58.0",
     "black>=24.10.0",
     "ipykernel>=6.29.5",
     "pre-commit>=4.0.1",

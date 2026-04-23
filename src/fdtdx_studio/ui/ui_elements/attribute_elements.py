@@ -1,11 +1,14 @@
 import re
-from nicegui import ui
-from typing import Callable, Any, Optional, List, Tuple
 from dataclasses import dataclass, field
+from typing import Any, Callable, List, Optional
+
+from nicegui import ui
+
 
 @dataclass
 class AttributeElement:
     """Base class for all attribute UI elements."""
+
     label: str
     value: Any
     on_change: Callable[[Any], None]
@@ -25,23 +28,31 @@ class AttributeElement:
     def _add_info_icon(self):
         """Adds a small ⓘ info icon that shows the tooltip on hover."""
         if self.tooltip:
-            ui.icon('info_outline').classes(
-                'text-grey-5 cursor-help'
-            ).style('font-size: 14px; margin-left: 2px;').tooltip(self.tooltip)
+            ui.icon("info_outline").classes("text-grey-5 cursor-help").style(
+                "font-size: 14px; margin-left: 2px;"
+            ).tooltip(self.tooltip)
 
 
 @dataclass
 class NumberElement(AttributeElement):
     """UI element for float/int values."""
+
     step: float = 1.0
-    format: str = '%.2f'
+    format: str = "%.2f"
 
     def render(self):
-        with ui.row().classes('w-full items-center gap-1') as container:
-            self.element = ui.number(
-                self.label, value=self.value, step=self.step,
-                format=self.format, on_change=lambda e: self.on_change(e.value)
-            ).classes('flex-1').props('dense')
+        with ui.row().classes("w-full items-center gap-1") as container:
+            self.element = (
+                ui.number(
+                    self.label,
+                    value=self.value,
+                    step=self.step,
+                    format=self.format,
+                    on_change=lambda e: self.on_change(e.value),
+                )
+                .classes("flex-1")
+                .props("dense")
+            )
             self._add_info_icon()
         return container
 
@@ -49,11 +60,14 @@ class NumberElement(AttributeElement):
 @dataclass
 class StringElement(AttributeElement):
     """UI element for string values."""
+
     def render(self):
-        with ui.row().classes('w-full items-center gap-1') as container:
-            self.element = ui.input(
-                self.label, value=self.value, on_change=lambda e: self.on_change(e.value)
-            ).classes('flex-1').props('dense')
+        with ui.row().classes("w-full items-center gap-1") as container:
+            self.element = (
+                ui.input(self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
+                .classes("flex-1")
+                .props("dense")
+            )
             self._add_info_icon()
         return container
 
@@ -61,11 +75,10 @@ class StringElement(AttributeElement):
 @dataclass
 class BooleanElement(AttributeElement):
     """UI element for boolean values."""
+
     def render(self):
-        with ui.row().classes('w-full items-center gap-1') as container:
-            self.element = ui.checkbox(
-                self.label, value=self.value, on_change=lambda e: self.on_change(e.value)
-            )
+        with ui.row().classes("w-full items-center gap-1") as container:
+            self.element = ui.checkbox(self.label, value=self.value, on_change=lambda e: self.on_change(e.value))
             self._add_info_icon()
         return container
 
@@ -73,18 +86,25 @@ class BooleanElement(AttributeElement):
 @dataclass
 class SelectElement(AttributeElement):
     """UI element for selecting from a list of options."""
+
     options: List[Any] = field(default_factory=list)
 
-    def __init__(self, label: str, value: Any, on_change: Callable[[Any], None], options: List[Any], tooltip: Optional[str] = None):
+    def __init__(
+        self,
+        label: str,
+        value: Any,
+        on_change: Callable[[Any], None],
+        options: List[Any],
+        tooltip: Optional[str] = None,
+    ):
         super().__init__(label, value, on_change, tooltip)
         self.options = options
 
     def render(self):
-        with ui.row().classes('w-full items-center gap-1') as container:
+        with ui.row().classes("w-full items-center gap-1") as container:
             self.element = ui.select(
-                self.options, label=self.label, value=self.value,
-                on_change=lambda e: self.on_change(e.value)
-            ).classes('flex-1')
+                self.options, label=self.label, value=self.value, on_change=lambda e: self.on_change(e.value)
+            ).classes("flex-1")
             self._add_info_icon()
         return container
 
@@ -92,9 +112,17 @@ class SelectElement(AttributeElement):
 @dataclass
 class MultiSelectElement(AttributeElement):
     """UI element for selecting multiple items from a list."""
+
     options: List[Any] = field(default_factory=list)
 
-    def __init__(self, label: str, value: Any, on_change: Callable[[Any], None], options: List[Any], tooltip: Optional[str] = None):
+    def __init__(
+        self,
+        label: str,
+        value: Any,
+        on_change: Callable[[Any], None],
+        options: List[Any],
+        tooltip: Optional[str] = None,
+    ):
         super().__init__(label, value, on_change, tooltip)
         self.options = options
         self.__post_init__()
@@ -104,11 +132,14 @@ class MultiSelectElement(AttributeElement):
             self.value = []
 
     def render(self):
-        with ui.row().classes('w-full items-center gap-1') as container:
+        with ui.row().classes("w-full items-center gap-1") as container:
             self.element = ui.select(
-                self.options, label=self.label, value=self.value,
-                multiple=True, on_change=lambda e: self.on_change(e.value)
-            ).classes('flex-1')
+                self.options,
+                label=self.label,
+                value=self.value,
+                multiple=True,
+                on_change=lambda e: self.on_change(e.value),
+            ).classes("flex-1")
             self._add_info_icon()
         return container
 
@@ -116,52 +147,49 @@ class MultiSelectElement(AttributeElement):
 @dataclass
 class ColorElement(AttributeElement):
     """UI element for color selection using a predefined palette."""
+
     def __post_init__(self):
         self.preset_colors = {
-            'Red': '#FF0000',
-            'Green': '#00FF00',
-            'Blue': '#0000FF',
-            'Orange': '#FFA500',
-            'Purple': '#800080',
-            'Cyan': '#00FFFF',
-            'Pink': '#FFC0CB',
-            'Yellow': '#FFFF00',
-            'Gray': '#808080',
-            'Black': '#000000',
+            "Red": "#FF0000",
+            "Green": "#00FF00",
+            "Blue": "#0000FF",
+            "Orange": "#FFA500",
+            "Purple": "#800080",
+            "Cyan": "#00FFFF",
+            "Pink": "#FFC0CB",
+            "Yellow": "#FFFF00",
+            "Gray": "#808080",
+            "Black": "#000000",
         }
-        self.reverse_preset_colors = {
-            v.lower(): k for k, v in self.preset_colors.items()
-        }
+        self.reverse_preset_colors = {v.lower(): k for k, v in self.preset_colors.items()}
 
     def render(self):
         normalized = self._normalize_hex(self.value)
 
-        with ui.column().classes('w-full gap-1') as self.element:
-            with ui.row().classes('items-center gap-1'):
+        with ui.column().classes("w-full gap-1") as self.element:
+            with ui.row().classes("items-center gap-1"):
                 if self.label:
                     ui.label(self.label)
                 self._add_info_icon()
 
-            with ui.row().classes('w-full items-end gap-2 no-wrap'):
+            with ui.row().classes("w-full items-end gap-2 no-wrap"):
                 # preset color selection
                 self.color_select = ui.select(
                     options=list(self.preset_colors.keys()),
-                    label='Color',
+                    label="Color",
                     value=self._get_color_name(normalized) if normalized in self.preset_colors.values() else None,
                     on_change=lambda e: self.set_color_by_name(e.value),
-                ).classes('w-17')
+                ).classes("w-17")
 
                 # color input
                 self.color_input = ui.color_input(
-                    '',
-                    value=normalized or '',
+                    "",
+                    value=normalized or "",
                     on_change=lambda e: self.on_color_input_change(e.value),
-                ).classes('w-30')
+                ).classes("w-30")
 
                 # color preview
-                self.color_preview = ui.html(
-                    self._preview_html(normalized)
-                ).classes('shrink-0')
+                self.color_preview = ui.html(self._preview_html(normalized)).classes("shrink-0")
 
         self.value = normalized if normalized is not None else self.value
         return self.element
@@ -203,15 +231,15 @@ class ColorElement(AttributeElement):
     def _sync_ui_from_value(self, update_select: bool = True):
         normalized = self._normalize_hex(self.value)
 
-        if hasattr(self, 'color_input') and self.color_input:
-            self.color_input.value = normalized or ''
+        if hasattr(self, "color_input") and self.color_input:
+            self.color_input.value = normalized or ""
             self.color_input.update()
 
-        if hasattr(self, 'color_preview') and self.color_preview:
+        if hasattr(self, "color_preview") and self.color_preview:
             self.color_preview.content = self._preview_html(normalized)
             self.color_preview.update()
 
-        if update_select and hasattr(self, 'color_select') and self.color_select:
+        if update_select and hasattr(self, "color_select") and self.color_select:
             if normalized and normalized.lower() in self.reverse_preset_colors:
                 self.color_select.value = self.reverse_preset_colors[normalized.lower()]
             else:
@@ -219,21 +247,21 @@ class ColorElement(AttributeElement):
             self.color_select.update()
 
     def _sync_ui_invalid(self):
-        if hasattr(self, 'color_input') and self.color_input:
-            self.color_input.value = ''
+        if hasattr(self, "color_input") and self.color_input:
+            self.color_input.value = ""
             self.color_input.update()
 
-        if hasattr(self, 'color_preview') and self.color_preview:
+        if hasattr(self, "color_preview") and self.color_preview:
             self.color_preview.content = self._preview_html(None)
             self.color_preview.update()
 
-        if hasattr(self, 'color_select') and self.color_select:
+        if hasattr(self, "color_select") and self.color_select:
             self.color_select.value = None
             self.color_select.update()
 
     def _get_color_name(self, hex_code: str | None) -> str:
         if not hex_code:
-            return 'Color'
+            return "Color"
         return self.reverse_preset_colors.get(hex_code.lower(), hex_code)
 
     def _normalize_hex(self, hex_code: Any) -> str | None:
@@ -244,10 +272,10 @@ class ColorElement(AttributeElement):
         if not hex_code:
             return None
 
-        if not hex_code.startswith('#'):
-            hex_code = f'#{hex_code}'
+        if not hex_code.startswith("#"):
+            hex_code = f"#{hex_code}"
 
-        if not re.fullmatch(r'#[0-9A-Fa-f]{6}', hex_code):
+        if not re.fullmatch(r"#[0-9A-Fa-f]{6}", hex_code):
             return None
 
         return hex_code.upper()
@@ -255,10 +283,10 @@ class ColorElement(AttributeElement):
     def _preview_html(self, color_hex: str | None) -> str:
         if color_hex:
             background = color_hex
-            extra = ''
+            extra = ""
         else:
-            background = 'transparent'
-            extra = '''
+            background = "transparent"
+            extra = """
                 background-image:
                     linear-gradient(45deg, #ddd 25%, transparent 25%),
                     linear-gradient(-45deg, #ddd 25%, transparent 25%),
@@ -266,9 +294,9 @@ class ColorElement(AttributeElement):
                     linear-gradient(-45deg, transparent 75%, #ddd 75%);
                 background-size: 12px 12px;
                 background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
-            '''
+            """
 
-        return f'''
+        return f"""
         <div style="
             width: 36px;
             height: 36px;
@@ -279,39 +307,54 @@ class ColorElement(AttributeElement):
             background-color: {background};
             {extra}
         "></div>
-        '''
+        """
+
 
 @dataclass
 class NestedObjectElement(AttributeElement):
     """UI element for navigating to a nested object's configuration."""
+
     on_navigate: Callable[[], None] | None = None
-    
+
     def render(self):
-        with ui.row().classes('w-full items-center justify-between') as container:
-            with ui.row().classes('items-center gap-1'):
+        with ui.row().classes("w-full items-center justify-between") as container:
+            with ui.row().classes("items-center gap-1"):
                 ui.label(self.label)
                 self._add_info_icon()
-            self.element = ui.button(icon='arrow_forward', on_click=self.on_navigate).props('flat round dense')
+            self.element = ui.button(icon="arrow_forward", on_click=self.on_navigate).props("flat round dense")
         return container
 
 
 @dataclass
 class Vector3Element(AttributeElement):
     """UI element for 3D vector values (x, y, z)."""
+
     def __post_init__(self):
         if not self.value:
             self.value = (0.0, 0.0, 0.0)
 
     def render(self):
-        with ui.column().classes('w-full') as self.element:
-            with ui.row().classes('items-center gap-1'):
-                ui.label(self.label).classes('text-sm font-bold')
+        with ui.column().classes("w-full") as self.element:
+            with ui.row().classes("items-center gap-1"):
+                ui.label(self.label).classes("text-sm font-bold")
                 self._add_info_icon()
-            with ui.row().classes('w-full flex-nowrap gap-1'):
-                self.x = ui.number('x', value=self.value[0], on_change=lambda e: self._on_component_change(0, e.value)).classes('flex-1').props('dense')
-                self.y = ui.number('y', value=self.value[1], on_change=lambda e: self._on_component_change(1, e.value)).classes('flex-1').props('dense')
-                self.z = ui.number('z', value=self.value[2], on_change=lambda e: self._on_component_change(2, e.value)).classes('flex-1').props('dense')
-        
+            with ui.row().classes("w-full flex-nowrap gap-1"):
+                self.x = (
+                    ui.number("x", value=self.value[0], on_change=lambda e: self._on_component_change(0, e.value))
+                    .classes("flex-1")
+                    .props("dense")
+                )
+                self.y = (
+                    ui.number("y", value=self.value[1], on_change=lambda e: self._on_component_change(1, e.value))
+                    .classes("flex-1")
+                    .props("dense")
+                )
+                self.z = (
+                    ui.number("z", value=self.value[2], on_change=lambda e: self._on_component_change(2, e.value))
+                    .classes("flex-1")
+                    .props("dense")
+                )
+
         return self.element
 
     def _on_component_change(self, index, val):
@@ -322,7 +365,7 @@ class Vector3Element(AttributeElement):
 
     def update(self, value: Any):
         self.value = value if value else (0.0, 0.0, 0.0)
-        if getattr(self, 'x', None):
+        if getattr(self, "x", None):
             self.x.value = self.value[0]
             self.y.value = self.value[1]
             self.z.value = self.value[2]

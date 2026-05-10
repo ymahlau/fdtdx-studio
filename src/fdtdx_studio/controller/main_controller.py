@@ -25,7 +25,7 @@ class Controller:
         """Initialize the Controller with references to the View and Model."""
 
         self.view = View()
-        self.open_Project(Project(controller=self))
+        self.open_Project(Project.create_new(controller=self))
         # Build the UI here so view.scene and other widgets are created
         self.view.build_base_ui(self)
         self.type_panel: ObjectConfigPanel

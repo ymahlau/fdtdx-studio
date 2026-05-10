@@ -20,7 +20,7 @@ class Project_Dialog_Controller:
     async def new_scene_controller(self, project: Project | None = None):
         """handles the different Dialog Windows when opening or importing Projects"""
         if project is None:
-            project = Project(controller=self.controller)
+            project = Project.create_new(controller=self.controller)
 
         def NoneCancel():  # Reached by not saving current Project
             """closes the Save Dialog and goes to the config panel for the new Project"""
@@ -146,6 +146,7 @@ class Project_Dialog_Controller:
         def actual_config_dialog():
             assert self.view.left_drawer is not None
             assert self.view.right_drawer is not None
+            self.controller.update_Simulation_Volume(1e-5, 1e-5, 1e-5)
             self.view.left_drawer.Volume_Panel.Volume_panel()
             with ui.dialog() as dialogFirstConfig, ui.card():
                 self.view.right_drawer.simparpanel.simulation_param_panel(dialogFirstConfig)

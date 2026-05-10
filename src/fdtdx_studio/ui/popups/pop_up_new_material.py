@@ -33,7 +33,12 @@ class pop_up_new_material(NewPopUp):
   def add_material(self, Permittivity, Permeability, Electrical_conductivity, Magnetic_conductivity, name):
     '''adds material with given settings'''
     self.pop_up_new_material.close()
-    self.pop_up_new_material.on('hide', lambda: (self.controller.add_material(Permittivity, Permeability, Electrical_conductivity, Magnetic_conductivity, name), ui.timer(0, lambda: self.controller.project.localmaterial_save(), once=True)))
+    client = ui.context.client
+    def handle_hide():
+        self.controller.add_material(Permittivity, Permeability, Electrical_conductivity, Magnetic_conductivity, name)
+        with client.layout:
+            ui.timer(0, lambda: self.controller.project.localmaterial_save(), once=True)
+    self.pop_up_new_material.on('hide', handle_hide)
     ui.notify('Material added successfully', position='bottom', color='green' )
     
 

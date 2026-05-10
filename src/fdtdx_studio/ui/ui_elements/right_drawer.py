@@ -41,8 +41,9 @@ class RightDrawer:
     async def update_drawer(self):
       """reloads the Simulation Parameter Panel. MUST BE CALLED TO REFRESH NEW VALUES"""
       if self.config_panel is not None:
+        client = self.config_panel.client
         self.config_panel.clear()
-        await ui.context.client.connected() #Ensures Ui is ready
+        await client.connected() #Ensures Ui is ready
         with self.config_panel:
           self.simparpanel.button = None
           self.simparpanel.simulation_param_panel()
@@ -50,7 +51,8 @@ class RightDrawer:
     async def update_vol_drawer(self):
       """reloads the Simulation Volume Panel. MUST BE CALLED TO REFRESH NEW VALUES"""
       if self.config_panel is not None:
+        client = self.config_panel.client
         self.config_panel.clear()
-        await ui.context.client.connected()
+        await client.connected()
         with self.config_panel:
           self.volume_panel.volume_param_panel()

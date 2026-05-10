@@ -254,7 +254,9 @@ class Controller:
     obj[0] = self.namecheck_material(self.model.material.get_material_list(),obj[0])
     self.model.material.material_list.insert(index,obj)
     self.view.left_drawer.update_materials()
-    ui.timer(0, lambda: self.project.localmaterial_save(), once=True)
+    client = ui.context.client
+    with client.layout:
+        ui.timer(0, lambda: self.project.localmaterial_save(), once=True)
     
     
 
@@ -343,7 +345,9 @@ class Controller:
     # If its called from a popup or a panel which is deleting itself it throws an error because the parent vanishes 
     # while ui_update is running, breaking it.
     
-    ui.timer(0, lambda: self.project.localproject_save(), once=True)
+    client = ui.context.client
+    with client.layout:
+        ui.timer(0, lambda: self.project.localproject_save(), once=True)
 
 
   def save_constraints(self, object_name, cons):

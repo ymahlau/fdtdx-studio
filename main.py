@@ -163,16 +163,33 @@ def _register_pages() -> None:
                 }
             </style>
             <script>
-                document.addEventListener("keydown", function(e) {
-                    if (e.target.type === "number" && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
+                function _fdtdx_preventSpin(e) {
+                    if (e.type === "wheel") {
                         e.preventDefault();
+                        return;
+                    }
+                    if (e.type === "keydown") {
+                        if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                            const hasModifier = e.shiftKey || e.ctrlKey || e.altKey || e.metaKey;
+                            const isAriaNav = e.target.hasAttribute("aria-expanded") || e.target.hasAttribute("aria-activedescendant");
+                            if (!hasModifier && !isAriaNav) {
+                                e.preventDefault();
+                            }
+                        }
+                    }
+                }
+                document.addEventListener("focusin", function(e) {
+                    if (e.target && e.target.type === "number") {
+                        e.target.addEventListener("keydown", _fdtdx_preventSpin);
+                        e.target.addEventListener("wheel", _fdtdx_preventSpin, { passive: false });
                     }
                 });
-                document.addEventListener("wheel", function(e) {
-                    if (e.target.type === "number") {
-                        e.preventDefault();
+                document.addEventListener("focusout", function(e) {
+                    if (e.target && e.target.type === "number") {
+                        e.target.removeEventListener("keydown", _fdtdx_preventSpin);
+                        e.target.removeEventListener("wheel", _fdtdx_preventSpin);
                     }
-                }, { passive: false });
+                });
             </script>
         """)
         Controller()

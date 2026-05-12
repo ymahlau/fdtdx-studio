@@ -10,7 +10,6 @@ requires-python = ">=3.11"
 dependencies = [
     "nicegui>=3.7.1",
     "fdtdx@git+https://github.com/ymahlau/fdtdx.git@df1f8a539bf26fcd0ab059f4fb076ba19a0f1d05",
-
 ]
 
 [project.urls]
@@ -34,13 +33,17 @@ fix = true
 exclude = ["examples", "slurm", "checks", "docs"]
 
 [tool.ruff.lint]
-extend-select = ["I"]
+extend-select = ["I", "RUF"]
+ignore = []
+allowed-confusables = ["α", "β", "γ", "δ", "ε", "ζ", "η", "θ", "ι", "κ", "λ", "μ", "ν", "ξ", "π", "ρ", "σ", "τ", "υ", "φ", "χ", "ψ", "ω", "Α", "Β", "Γ", "Δ", "Ε", "Ζ", "Η", "Θ", "Ι", "Κ", "Λ", "Μ", "Ν", "Ξ", "Π", "Ρ", "Σ", "Τ", "Υ", "Φ", "Χ", "Ψ", "Ω"]
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
 [project.optional-dependencies]
 dev = [
+    "playwright>=1.58.0",
     "black>=24.10.0",
     "ipykernel>=6.29.5",
     "pre-commit>=4.0.1",

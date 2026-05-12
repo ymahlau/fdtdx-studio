@@ -1,4 +1,5 @@
 import fdtdx
+
 from .model import Model
 
 print("\n===== SIMPLE CREATION TESTS =====\n")
@@ -12,7 +13,7 @@ model = Model([])
 
 print("-> Creating Material Object...")
 mat = fdtdx.Material()
-mat_obj = model.create_material_obj(name="MatTest", material=mat, partial_real_shape=(1,1,1))
+mat_obj = model.create_material_obj(name="MatTest", material=mat, partial_real_shape=(1, 1, 1))
 
 print("Material object:", mat_obj)
 print("Material name:", mat_obj.name)
@@ -28,7 +29,7 @@ print("-> Creating Uniform Plane Source...")
 
 src_uniform = model.create_mode_plane_source_obj(
     name="UniformSource",
-    direction=(1,0,0),
+    direction=(1, 0, 0),
     azimuth_angle=30,
 )
 
@@ -63,11 +64,7 @@ print()
 
 print("-> Creating Energy Detector...")
 
-det_energy = model.create_energy_detector_obj(
-    name="EnergyDet",
-    partial_real_shape=(1,1,1),
-    color=(0.5,1.0,0.5)
-)
+det_energy = model.create_energy_detector_obj(name="EnergyDet", partial_real_shape=(1, 1, 1), color=(0.5, 1.0, 0.5))
 
 print("Energy Detector:", det_energy)
 print("Energy Detector name:", det_energy.name)
@@ -81,10 +78,7 @@ print()
 
 print("-> Creating Field Detector...")
 
-det_field = model.create_field_detector_obj(
-    name="FieldDet",
-    components=("Ex", "Ey", "Ez")
-)
+det_field = model.create_field_detector_obj(name="FieldDet", components=("Ex", "Ey", "Ez"))
 
 print("Field Detector:", det_field)
 print("Field Detector components:", det_field.components)
@@ -98,10 +92,7 @@ print()
 
 print("-> Creating Poynting Flux Detector...")
 
-det_flux = model.create_poynting_flux_detector(
-    name="FluxDet",
-    direction=(0,0,1)
-)
+det_flux = model.create_poynting_flux_detector(name="FluxDet", direction=(0, 0, 1))
 
 print("Poynting Flux Detector:", det_flux)
 print("Direction:", det_flux.direction)

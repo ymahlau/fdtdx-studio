@@ -1,17 +1,22 @@
 import fdtdx 
 import math
 from nicegui import ui
+
 from fdtdx_studio.ui.attribute_definitions import ALL_DOCS, ATTRIBUTE_TOOLTIP_FALLBACKS
 
+
 def get_dyn_tooltip(attr: str, default: str) -> str:
-    doc = ALL_DOCS.get('SimulationVolume', {}).get(attr)
-    if doc: return doc
+    doc = ALL_DOCS.get("SimulationVolume", {}).get(attr)
+    if doc:
+        return doc
     doc = ATTRIBUTE_TOOLTIP_FALLBACKS.get(attr)
-    if doc: return doc
+    if doc:
+        return doc
     return default
 
 class volume_panel():
   def __init__(self, *args):
+    self.save = None
     if len(args) == 2:
       self.drawer = args[0]
       self.controller = args[1]
@@ -80,22 +85,22 @@ class volume_panel():
 
     self.save = ui.button("Apply", on_click=onSaved).classes('w-full')
 
-  def _validate(self,value):
-    try:
-      if self.isFloat(value):
-        if value > 0:
-          self.save.enable()
-          return None
-        else:
-          self.save.disable()
-          return "Number must be greater than 0"
-          
-      else: 
-        self.save.disable()
-        return "Input must be a number"
-    except (ValueError, TypeError):
-      self.save.disable()
-      return "Input must be a number"
+  def _validate(self, value):
+      try:
+          if self.isFloat(value):
+              if value > 0:
+                  if self.save: self.save.enable()
+                  return None
+              else:
+                  if self.save: self.save.disable()
+                  return "Number must be greater than 0"
+
+          else:
+              if self.save: self.save.disable()
+              return "Input must be a number"
+      except (ValueError, TypeError):
+          if self.save: self.save.disable()
+          return "Input must be a number"
 
 
 
@@ -106,10 +111,10 @@ class volume_panel():
             self.material = obj[1]
             break
 
-  def isFloat(self, element: 'str') -> bool:
+  def isFloat(self, element: "str") -> bool:
       """check if an input value is float"""
       try:
-        float(element)
-        return True
+          float(element)
+          return True
       except ValueError:
-        return False   
+          return False

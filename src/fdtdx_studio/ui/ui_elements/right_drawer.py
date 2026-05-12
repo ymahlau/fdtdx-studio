@@ -1,4 +1,5 @@
 from nicegui import ui
+
 from fdtdx_studio.ui.panels.simulation_parameters_panel import simulation_parameters_panel
 from fdtdx_studio.ui.panels.mode_source_panel import ModeSourcePanel
 from fdtdx_studio.ui.panels.poynting_flux_detector_panel import PoyntingFluxDetectorPanel
@@ -6,7 +7,7 @@ from fdtdx_studio.ui.panels.volume_panel import volume_panel
 
 class RightDrawer:
     """Creates the right drawer UI visible on the main view, used for configuring simulation or object parameters.
-    
+
     Contains controls for adjusting various simulation settings.
     """
 
@@ -25,7 +26,8 @@ class RightDrawer:
                 ui.label('Configuration').style('font-size: 18px; margin-bottom: 8px; font-weight: bold;')
                 with ui.scroll_area().classes('justify-start items-start h-full').style('padding: 0px;') as self.config_panel:
                   self.view.config_panel = self.config_panel
-                  self.simparpanel.simulation_param_panel()
+                  with self.config_panel:
+                    self.simparpanel.simulation_param_panel()
                 
                 ui.button('Simulation Volume', on_click=self.update_vol_drawer).classes('w-full').style('margin-bottom: 8px;')
                 button = ui.button('Simulation Parameters', on_click=self.update_drawer).classes('w-full ').style('margin-bottom: 16px;')

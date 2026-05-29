@@ -48,7 +48,7 @@ class LeftDrawer:
                 self.sim_obj_select = ui.select(
                     options=[],
                     label="Simulation Objects",
-                    on_change=lambda e: self.controller.choose_box(e.value) if e.value else None
+                    on_change=lambda e: self.controller.choose_box(e.value)
                 ).classes("flex-1")
                 with ui.row().classes("gap-0"):
                     ui.button(
@@ -65,7 +65,7 @@ class LeftDrawer:
                 self.source_select = ui.select(
                     options=[],
                     label="Sources",
-                    on_change=lambda e: self.controller.choose_box(e.value) if e.value else None
+                    on_change=lambda e: self.controller.choose_box(e.value)
                 ).classes("flex-1")
                 with ui.row().classes("gap-0"):
                     ui.button(
@@ -82,7 +82,7 @@ class LeftDrawer:
                 self.detector_select = ui.select(
                     options=[],
                     label="Detectors",
-                    on_change=lambda e: self.controller.choose_box(e.value) if e.value else None
+                    on_change=lambda e: self.controller.choose_box(e.value)
                 ).classes("flex-1")
                 with ui.row().classes("gap-0"):
                     ui.button(
@@ -107,7 +107,7 @@ class LeftDrawer:
                 self.material_select = ui.select(
                     options=[],
                     label="Materials",
-                    on_change=lambda e: self.controller.view_material(self.materials_dict[e.value]) if e.value else None
+                    on_change=lambda e: self.controller.view_material(self.materials_dict.get(e.value))
                 ).classes("flex-1")
                 with ui.row().classes("gap-0"):
                     ui.button(
@@ -162,6 +162,8 @@ class LeftDrawer:
             self.sim_obj_select.options = []
         if self.source_select is not None:
             self.source_select.options = []
+        if self.pml_thickness is not None:
+            self.pml_thickness.value = 0
 
     def scrollarea_add_Object(self, object):
         """

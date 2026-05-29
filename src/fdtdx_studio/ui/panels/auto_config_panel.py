@@ -201,9 +201,21 @@ class AutoConfigPanel(ObjectConfigPanel):
                 data = {}
 
         if isinstance(data, dict):
-            return data.get(key, default)
+            val = data.get(key, default)
         else:
-            return getattr(data, key, default)
+            val = getattr(data, key, default)
+            
+        if key == "dtype" and val is not None:
+            if hasattr(val, "__name__"):
+                val = val.__name__
+            elif hasattr(val, "name"):
+                val = val.name
+            else:
+                val_str = str(val)
+                if "." in val_str:
+                    val = val_str.split(".")[-1].strip("'>")
+                    
+        return val
 
     def _update_param(self, key, value):
         data = self.local_data

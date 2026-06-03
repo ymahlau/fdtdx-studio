@@ -208,7 +208,7 @@ class ObjectConfigPanel:
                                 color=None,
                                 on_click=lambda: self.pop_up_con.open_pop_up("new_con", self.name_of_all_objects),
                             ).props("flat").style("pointer-events: auto; z-index: 10")
-                    with ui.scroll_area().classes("w-full h-48 ml-4") as self.scroll_area_con:
+                    with ui.scroll_area().classes("w-full max-h-48 ml-4") as self.scroll_area_con:
                         pass
 
     def get_parameters(self):

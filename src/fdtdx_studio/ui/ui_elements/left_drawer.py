@@ -18,12 +18,14 @@ class LeftDrawer:
         """Initializes the LeftDrawer with references to the main view and controller."""
         self.controller = controller
         self.view = view
-        # LeftDrawer manages its own popup + scrollarea
+        # LeftDrawer manages its own popup + select elements
         self.detector_popup = DetectorPopup(controller)
         self.Volume_Panel = volume_panel(controller)
-        self.scrollarea_sim_objects = None
-        self.scrollarea_source_objects = None
-        self.scrollarea_sim_detector = None
+        self.sim_obj_select = None
+        self.source_select = None
+        self.detector_select = None
+        self.material_select = None
+        self.materials_dict = {}
         self.pml_thickness = None
         self.build()
 
@@ -34,103 +36,153 @@ class LeftDrawer:
             .style("background-color: #E3E3E3")
             .classes("justify-start") as self.left_drawer
         ):
-            # Expansion for Simulation Objects
-            with ui.expansion().props("open").classes("w-full") as self.sim_obj_exp:
-                with self.sim_obj_exp.add_slot("header"):
-                    with ui.row().classes("w-full items-center justify-between"):
-                        ui.label("Simulation Volume").style("font-size: 15px")
-                with ui.scroll_area().classes("w-full h-48 ml-4") as self.scrollarea_sim_volume:
-                    ui.button("Simulation Volume", on_click=lambda: self.Volume_Panel.Volume_panel())
-
-            with ui.expansion().props("open").classes("w-full") as self.sim_obj_exp:
-                with self.sim_obj_exp.add_slot("header"):
-                    with ui.row().classes("w-full items-center justify-between"):
-                        ui.label("Simulation Objects").style("font-size: 15px")
-                        ui.button(
-                            icon="add",
-                            color=None,
-                            on_click=lambda: pop_up_new_object(self.controller).open_new_object_popup(),
-                        ).props("flat").style("pointer-events: auto; z-index: 10")
-
-                with ui.scroll_area().classes("w-full h-48 ml-4") as self.scrollarea_sim_objects:
-                    pass
-
-            # Expansion for Sources
-            with ui.expansion().props("open").classes("w-full") as self.source_exp:
-                with self.source_exp.add_slot("header"):
-                    with ui.row().classes("w-full items-center justify-between"):
-                        ui.label("Sources").style("font-size: 15px")
-                        ui.button(
-                            "",
-                            icon="add",
-                            color=None,
-                            on_click=lambda: pop_up_new_source(self.controller).open_new_source_popup(),
-                        ).props("flat")
-                with ui.scroll_area().classes("w-full h-48 ml-4") as self.scrollarea_source_objects:
-                    pass
-
-            # Expansion for Detectors
-            with ui.expansion().props("open").classes("w-full") as detector_exp:
-                with detector_exp.add_slot("header"):
-                    with ui.row().classes("w-full items-center justify-between"):
-                        ui.label("Detectors").style("font-size: 15px")
-                        ui.button(icon="add", color=None, on_click=self.detector_popup.open).props("flat").style(
-                            "pointer-events: auto; z-index: 10"
-                        )
-
-                with ui.scroll_area().classes("w-full h-48 ml-4") as self.scrollarea_sim_detector:
-                    pass
+            # Simulation Volume
+            with ui.row().classes("w-full items-center justify-between").style("padding: 16px 16px 8px 16px;"):
+                ui.label("Simulation Volume").style("font-size: 15px; font-weight: 500;")
+                ui.button(icon="edit", on_click=lambda: self.Volume_Panel.Volume_panel()).props("flat dense round").tooltip("Edit Simulation Volume")
 
             ui.separator().style("margin: 8px 0;")
 
-            with ui.row().classes("w-full items-center justify-between"):
+            # Simulation Objects
+            with ui.row().classes("w-full items-center gap-1").style("padding: 0 16px; margin-bottom: 8px;"):
+                self.sim_obj_select = ui.select(
+                    options=[],
+                    label="Simulation Objects",
+                    on_change=lambda e: self.controller.choose_box(e.value)
+                ).classes("flex-1")
+                with ui.row().classes("gap-0"):
+                    ui.button(
+                        icon="add",
+                        on_click=lambda: pop_up_new_object(self.controller).open_new_object_popup(),
+                    ).props("flat dense round").tooltip("Add new object")
+                    ui.button(
+                        icon="delete",
+                        on_click=self.delete_selected_sim_object
+                    ).props("flat dense round text-red").tooltip("Delete selected object")
+
+            # Sources
+            with ui.row().classes("w-full items-center gap-1").style("padding: 0 16px; margin-bottom: 8px;"):
+                self.source_select = ui.select(
+                    options=[],
+                    label="Sources",
+                    on_change=lambda e: self.controller.choose_box(e.value)
+                ).classes("flex-1")
+                with ui.row().classes("gap-0"):
+                    ui.button(
+                        icon="add",
+                        on_click=lambda: pop_up_new_source(self.controller).open_new_source_popup(),
+                    ).props("flat dense round").tooltip("Add new source")
+                    ui.button(
+                        icon="delete",
+                        on_click=self.delete_selected_source
+                    ).props("flat dense round text-red").tooltip("Delete selected source")
+
+            # Detectors
+            with ui.row().classes("w-full items-center gap-1").style("padding: 0 16px; margin-bottom: 8px;"):
+                self.detector_select = ui.select(
+                    options=[],
+                    label="Detectors",
+                    on_change=lambda e: self.controller.choose_box(e.value)
+                ).classes("flex-1")
+                with ui.row().classes("gap-0"):
+                    ui.button(
+                        icon="add",
+                        on_click=self.detector_popup.open,
+                    ).props("flat dense round").tooltip("Add new detector")
+                    ui.button(
+                        icon="delete",
+                        on_click=self.delete_selected_detector
+                    ).props("flat dense round text-red").tooltip("Delete selected detector")
+
+            ui.separator().style("margin: 8px 0;")
+
+            with ui.row().classes("w-full items-center justify-between").style("padding: 0 16px; margin-bottom: 8px;"):
                 ui.label("PML-Thickness:").style("font-size: 15px").classes("flex-1").props("dense")
                 self.pml_thickness = ui.number(
                     value=0, min=0, on_change=lambda e: self.controller.set_pml_thickness(e.value)
+                ).classes("flex-1 w-16")
+
+            # Materials
+            with ui.row().classes("w-full items-center gap-1").style("padding: 0 16px; margin-bottom: 8px;"):
+                self.material_select = ui.select(
+                    options=[],
+                    label="Materials",
+                    on_change=lambda e: self.controller.view_material(self.materials_dict.get(e.value))
                 ).classes("flex-1")
+                with ui.row().classes("gap-0"):
+                    ui.button(
+                        icon="add",
+                        on_click=lambda: pop_up_new_material(self.controller).open_new_material_popup(),
+                    ).props("flat dense round").tooltip("Add new material")
+                    ui.button(
+                        icon="delete",
+                        on_click=self.delete_selected_material
+                    ).props("flat dense round text-red").tooltip("Delete selected material")
+            
+            with ui.row().classes("w-full justify-end").style("padding: 0 16px; margin-bottom: 8px;"):
+                ui.button(
+                    icon="file_upload", on_click=lambda: self.controller.upload_material_list()
+                ).props("flat dense round").tooltip("Upload a List of custom materials")
+                ui.button(
+                    icon="file_download", on_click=lambda: self.controller.download_material_list()
+                ).props("flat dense round").tooltip("Download your custom Materials")
 
-            # Expansion for Materials
-            with ui.expansion().props("open").classes("w-full") as material_exp:
-                with material_exp.add_slot("header"):
-                    with ui.row().classes("w-full items-center justify-between"):
-                        ui.label("Materials").style("font-size: 15px").classes("flex-1").props("dense")
-                        ui.button(
-                            icon="file_upload", color=None, on_click=lambda: self.controller.upload_material_list()
-                        ).props("flat dense size=sm").tooltip("Upload a List of custom materials")
-                        ui.button(
-                            icon="file_download", color=None, on_click=lambda: self.controller.download_material_list()
-                        ).props("flat dense size=sm").tooltip(
-                            "Download your custom Materials. This List will not contain Preset Materials"
-                        )
-                        ui.button(
-                            icon="add",
-                            on_click=lambda: pop_up_new_material(self.controller).open_new_material_popup(),
-                            color=None,
-                        ).props("flat dense").tooltip("Add new material")
+            self.update_materials()
 
-                with ui.scroll_area().classes("w-full h-48 ml-4") as self.scrollarea_materials:
-                    self.update_materials()
+    def delete_selected_sim_object(self):
+        if self.sim_obj_select is not None and self.sim_obj_select.value:
+            self.controller.delete_object(self.sim_obj_select.value)
+            self.sim_obj_select.value = None
+            
+    def delete_selected_source(self):
+        if self.source_select is not None and self.source_select.value:
+            self.controller.delete_object(self.source_select.value)
+            self.source_select.value = None
+            
+    def delete_selected_detector(self):
+        if self.detector_select is not None and self.detector_select.value:
+            self.controller.delete_object(self.detector_select.value)
+            self.detector_select.value = None
+            
+    def delete_selected_material(self):
+        if self.material_select is not None:
+            name = self.material_select.value
+            if name:
+                obj = self.materials_dict.get(name)
+                if obj and obj[2]:
+                    self.delete_material(obj)
+                else:
+                    ui.notify("Cannot delete preset material", type="warning")
 
     def clear_drawer(self):
-        """clears all scrollareas in left drawer"""
-        assert self.scrollarea_sim_detector is not None
-        assert self.scrollarea_sim_objects is not None
-        assert self.scrollarea_source_objects is not None
-        self.scrollarea_sim_detector.clear()
-        self.scrollarea_sim_objects.clear()
-        self.scrollarea_source_objects.clear()
+        """clears all options in left drawer"""
+        if self.detector_select is not None:
+            self.detector_select.options = []
+        if self.sim_obj_select is not None:
+            self.sim_obj_select.options = []
+        if self.source_select is not None:
+            self.source_select.options = []
+        if self.pml_thickness is not None:
+            self.pml_thickness.value = 0
 
     def scrollarea_add_Object(self, object):
         """
-        create UI row in scroll area (safe)
-        param object: tuple with (name, type)
+        adds object to the respective dropdown options
+        param object: tuple with (name, type) or more elements
         type object: tuple
         """
-        match object[1]:
+        name, typ = object[0], object[1]
+        match typ:
             case "UniformMaterialObject" | "scrollarea_sim_objects":
-                container = self.scrollarea_sim_objects
+                if self.sim_obj_select is not None:
+                    if name not in self.sim_obj_select.options:
+                        self.sim_obj_select.options.append(name)
+                        self.sim_obj_select.update()
             case "ModePlaneSource" | "GaussianPlaneSource" | "scrollarea_sim_sources":
-                container = self.scrollarea_source_objects
+                if self.source_select is not None:
+                    if name not in self.source_select.options:
+                        self.source_select.options.append(name)
+                        self.source_select.update()
             case (
                 "EnergyDetector"
                 | "FieldDetector"
@@ -139,47 +191,33 @@ class LeftDrawer:
                 | "PoyntingFluxDetector"
                 | "scrollarea_sim_detector"
             ):
-                container = self.scrollarea_sim_detector
+                if self.detector_select is not None:
+                    if name not in self.detector_select.options:
+                        self.detector_select.options.append(name)
+                        self.detector_select.update()
             case "PerfectlyMatchedLayer":
-                container = None
-                if object[0] is not None:
+                if name is not None:
                     assert self.pml_thickness is not None
-                    self.pml_thickness.value = object[0]
-            case _:
-                container = None
-
-        if container is not None:
-            with container:
-                with ui.row() as row:
-                    ui.button(object[0], on_click=lambda e=object[0]: self.controller.choose_box(e), color=None).props(
-                        "flat"
-                    )
-                    ui.button(
-                        icon="delete", on_click=lambda e=object[0]: self.controller.delete_object(e), color=None
-                    ).props("flat")
-            self.view.row_list.append(row)
-
-    def scrollarea_add_material(self, obj):
-        """
-        adds material to the material scrollarea
-        param obj: tuple with (name, material, is_custom)
-        type obj: tuple
-        """
-        with self.scrollarea_materials:
-            with ui.row():
-                ui.button(obj[0], on_click=lambda e=obj: self.controller.view_material(e), color=None).props("flat")
-                if obj[2]:
-                    ui.button(
-                        icon="delete", on_click=lambda object=obj: self.delete_material(object), color=None
-                    ).props("flat")
+                    self.pml_thickness.value = name
 
     def update_materials(self):
         """
-        clears and rebuilds the material scrollarea
+        clears and rebuilds the material dropdown options
         """
-        self.scrollarea_materials.clear()
+        if self.material_select is None:
+            return
+            
+        self.materials_dict = {}
+        options = []
         for obj in self.controller.model.material.material_list:
-            self.scrollarea_add_material(obj)
+            name = obj[0]
+            self.materials_dict[name] = obj
+            options.append(name)
+            
+        self.material_select.options = options
+        self.material_select.update()
+        if self.material_select.value not in options:
+            self.material_select.value = None
 
     def delete_material(self, material):
         """
@@ -209,7 +247,7 @@ class LeftDrawer:
 
     def update(self, objects):
         """
-        clears and rebuilds entire left drawer basend on data in project
+        clears and rebuilds entire left drawer based on data in project
         param objects: list of tuples with (name, type)
         type objects: list
         """
@@ -217,3 +255,18 @@ class LeftDrawer:
         self.update_materials()
         for i in objects:
             self.scrollarea_add_Object(i)
+            
+        if self.sim_obj_select is not None:
+            if self.sim_obj_select.value not in self.sim_obj_select.options:
+                self.sim_obj_select.value = None
+            self.sim_obj_select.update()
+            
+        if self.source_select is not None:
+            if self.source_select.value not in self.source_select.options:
+                self.source_select.value = None
+            self.source_select.update()
+            
+        if self.detector_select is not None:
+            if self.detector_select.value not in self.detector_select.options:
+                self.detector_select.value = None
+            self.detector_select.update()

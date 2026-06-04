@@ -435,7 +435,7 @@ class Export:
         match obj:
             case EnergyDetector():
                 result.update({"x_slice": obj.x_slice, "y_slice": obj.y_slice, "z_slice": obj.z_slice})
-            case FieldDetector() | PhasorDetector():
+            case PhasorDetector():
                 result.update(
                     {
                         "wave_characters": {

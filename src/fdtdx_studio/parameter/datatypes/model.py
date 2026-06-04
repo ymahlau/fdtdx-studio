@@ -527,7 +527,7 @@ class Model(Constraints):
 
     def delete_by_object_name(self, name):
         for idx, obj in enumerate(self.track_object_list):
-            if obj.name == name:
+            if obj is not None and getattr(obj, 'name', None) == name:
                 del self.track_object_list[idx]
 
                 if self.current >= len(self.track_object_list):

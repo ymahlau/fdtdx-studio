@@ -1,12 +1,13 @@
 from fdtdx.objects.static_material.static import SimulationVolume, UniformMaterialObject
 from nicegui import ui
 
-from fdtdx_studio.ui.panels.volume_panel import volume_panel
 from fdtdx_studio.ui.popups.detector_popup import DetectorPopup
 from fdtdx_studio.ui.popups.pop_up_new_material import pop_up_new_material
 from fdtdx_studio.ui.popups.pop_up_new_object import pop_up_new_object
 from fdtdx_studio.ui.popups.pop_up_new_source import pop_up_new_source
-
+import fdtdx
+from fdtdx_studio.ui.popups.detector_popup import DetectorPopup
+from fdtdx_studio.ui.popups.pop_up_new_material import pop_up_new_material
 
 class LeftDrawer:
     """Creates the left drawer UI visible on the main view, used for creating and managing simulation components.
@@ -20,7 +21,6 @@ class LeftDrawer:
         self.view = view
         # LeftDrawer manages its own popup + select elements
         self.detector_popup = DetectorPopup(controller)
-        self.Volume_Panel = volume_panel(controller)
         self.sim_obj_select = None
         self.source_select = None
         self.detector_select = None
@@ -36,13 +36,6 @@ class LeftDrawer:
             .style("background-color: #E3E3E3")
             .classes("justify-start") as self.left_drawer
         ):
-            # Simulation Volume
-            with ui.row().classes("w-full items-center justify-between").style("padding: 16px 16px 8px 16px;"):
-                ui.label("Simulation Volume").style("font-size: 15px; font-weight: 500;")
-                ui.button(icon="edit", on_click=lambda: self.Volume_Panel.Volume_panel()).props("flat dense round").tooltip("Edit Simulation Volume")
-
-            ui.separator().style("margin: 8px 0;")
-
             # Simulation Objects
             with ui.row().classes("w-full items-center gap-1").style("padding: 0 16px; margin-bottom: 8px;"):
                 self.sim_obj_select = ui.select(

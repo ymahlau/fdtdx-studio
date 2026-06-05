@@ -199,4 +199,6 @@ class new_pop_up:
         self.input_width.value = 1
         self.input_height.value = 1
         self.new_pop_up.close()
-        ui.timer(0, lambda: self.controller.ui_update(), once=True)
+        client = ui.context.client
+        with client.layout:
+            ui.timer(0, lambda: self.controller.ui_update(), once=True)

@@ -1,3 +1,4 @@
+from aiohttp import client_exceptions
 import inspect
 
 import fdtdx
@@ -332,7 +333,9 @@ class Controller:
         self.model.material.material_list.insert(index, obj)
         if self.view.left_drawer is not None:
             self.view.left_drawer.update_materials()
-        ui.timer(0, lambda: self.project.localmaterial_save(), once=True)
+        client = ui.context.client
+        with client.layout:
+            ui.timer(0, lambda: self.project.localmaterial_save(), once=True)
 
     def download_material_list(self):
         """exports material list"""
@@ -432,7 +435,9 @@ class Controller:
         # If its called from a popup or a panel which is deleting itself it throws an error because the parent vanishes
         # while ui_update is running, breaking it.
 
-        ui.timer(0, lambda: self.project.localproject_save(), once=True)
+        client = ui.context.client
+        with client.layout:
+            ui.timer(0, lambda: self.project.localproject_save(), once=True)
 
     def save_constraints(self, object_name, cons):
         # delete removed constraints
